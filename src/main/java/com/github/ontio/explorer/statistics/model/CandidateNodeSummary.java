@@ -13,7 +13,7 @@
  * along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.ontio.explorersummary.model;
+package com.github.ontio.explorer.statistics.model;
 
 import com.github.ontio.core.governance.PeerPoolItem;
 import lombok.AllArgsConstructor;

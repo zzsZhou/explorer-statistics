@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.ontio.explorersummary.mapper.TxDetailMapper">
-  <resultMap id="BaseResultMap" type="com.github.ontio.explorersummary.model.TxDetail">
+<mapper namespace="com.github.ontio.explorer.statistics.mapper.TxDetailMapper">
+  <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.TxDetail">
     <!--
       WARNING - @mbg.generated
     -->

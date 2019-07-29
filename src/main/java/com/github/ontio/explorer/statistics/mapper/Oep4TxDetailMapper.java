@@ -13,9 +13,9 @@
  * along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.ontio.explorersummary.mapper;
+package com.github.ontio.explorer.statistics.mapper;
 
-import com.github.ontio.explorersummary.model.Oep4TxDetail;
+import com.github.ontio.explorer.statistics.model.Oep4TxDetail;
 import tk.mybatis.mapper.common.Mapper;
 
 public interface Oep4TxDetailMapper extends Mapper<Oep4TxDetail> {

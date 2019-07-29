@@ -1,4 +1,4 @@
-package com.github.ontio.explorersummary.model;
+package com.github.ontio.explorer.statistics.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

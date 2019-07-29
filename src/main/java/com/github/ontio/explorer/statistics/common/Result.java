@@ -13,7 +13,7 @@
  * along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.ontio.explorersummary.common;
+package com.github.ontio.explorer.statistics.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.ontio.explorersummary.mapper.ContractMapper">
-  <resultMap id="BaseResultMap" type="com.github.ontio.explorersummary.model.Contract">
+<mapper namespace="com.github.ontio.explorer.statistics.mapper.ContractMapper">
+  <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.Contract">
     <!--
       WARNING - @mbg.generated
     -->
@@ -60,7 +60,7 @@
   <!--
   self-defined SQL
   -->
-  <select id="selectAllApprovedContract" resultType="com.github.ontio.explorersummary.model.Contract" useCache="false">
+  <select id="selectAllApprovedContract" resultType="com.github.ontio.explorer.statistics.model.Contract" useCache="false">
     select <include refid="detailColumns"/>
     from tbl_contract
     where audit_flag = 1

@@ -1,4 +1,4 @@
-package com.github.ontio.explorersummary.common;
+package com.github.ontio.explorer.statistics.common;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;

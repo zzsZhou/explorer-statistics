@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.ontio.explorersummary.mapper.ContractDailySummaryMapper">
-  <resultMap id="BaseResultMap" type="com.github.ontio.explorersummary.model.ContractDailySummary">
+<mapper namespace="com.github.ontio.explorer.statistics.mapper.ContractDailySummaryMapper">
+  <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.ContractDailySummary">
     <!--
       WARNING - @mbg.generated
     -->
@@ -21,11 +21,11 @@
   <select id="selectMaxTime" resultType="java.lang.Integer" useCache="false">
     select MAX(time) from tbl_contract_daily_summary
   </select>
-  <select id="selectAllContract" resultType="com.github.ontio.explorersummary.model.Contract" useCache="false">
+  <select id="selectAllContract" resultType="com.github.ontio.explorer.statistics.model.Contract" useCache="false">
     select * from tbl_contract_daily_summary
     order by time DESC
   </select>
-  <select id="selectContractSummary" parameterType="java.lang.String" resultType="com.github.ontio.explorersummary.model.ContractDailySummary" useCache="false">
+  <select id="selectContractSummary" parameterType="java.lang.String" resultType="com.github.ontio.explorer.statistics.model.ContractDailySummary" useCache="false">
     select contract_hash, SUM(tx_count) as txCount, SUM(ont_sum) as ontSum , SUM(ong_sum) as ongSum ,SUM(new_address_count) as newAddressCount
     from tbl_contract_daily_summary
     where contract_hash = #{contractHash}

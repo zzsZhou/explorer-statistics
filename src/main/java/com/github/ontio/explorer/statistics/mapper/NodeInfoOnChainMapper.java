@@ -1,6 +1,6 @@
-package com.github.ontio.explorersummary.mapper;
+package com.github.ontio.explorer.statistics.mapper;
 
-import com.github.ontio.explorersummary.model.NodeInfoOnChain;
+import com.github.ontio.explorer.statistics.model.NodeInfoOnChain;
 import org.springframework.stereotype.Repository;
 import tk.mybatis.mapper.common.Mapper;
 

@@ -1,4 +1,4 @@
-package com.github.ontio.explorersummary.task;
+package com.github.ontio.explorer.statistics.task;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

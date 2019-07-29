@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.ontio.explorersummary.mapper.TxEventLogMapper">
-    <resultMap id="BaseResultMap" type="com.github.ontio.explorersummary.model.TxEventLog">
+<mapper namespace="com.github.ontio.explorer.statistics.mapper.TxEventLogMapper">
+    <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.TxEventLog">
         <!--
           WARNING - @mbg.generated
         -->

@@ -8,8 +8,8 @@
         <version>2.1.4.RELEASE</version>
         <relativePath/>
     </parent>
-    <groupId>com.github.ontio</groupId>
-    <artifactId>explorer-summary</artifactId>
+    <groupId>com.github.ontio.explorer</groupId>
+    <artifactId>statistics</artifactId>
     <version>1.1.0.RELEASE</version>
     <name>explorer-summary</name>
     <description>Demo project for Spring Boot</description>

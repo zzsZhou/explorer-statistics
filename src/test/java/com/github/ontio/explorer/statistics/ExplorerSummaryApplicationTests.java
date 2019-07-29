@@ -1,7 +1,7 @@
-package com.github.ontio.explorersummary;
+package com.github.ontio.explorer.statistics;
 
-import com.github.ontio.explorersummary.task.NodeSchedule;
-import com.github.ontio.explorersummary.task.DailyInfoSchedule;
+import com.github.ontio.explorer.statistics.task.NodeSchedule;
+import com.github.ontio.explorer.statistics.task.DailyInfoSchedule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

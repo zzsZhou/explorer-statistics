@@ -13,10 +13,10 @@
  * along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.ontio.explorersummary.controller;
+package com.github.ontio.explorer.statistics.controller;
 
-import com.github.ontio.explorersummary.common.Result;
-import com.github.ontio.explorersummary.service.SummaryService;
+import com.github.ontio.explorer.statistics.common.Result;
+import com.github.ontio.explorer.statistics.service.SummaryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

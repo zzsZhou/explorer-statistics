@@ -13,10 +13,10 @@
  * along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.ontio.explorersummary.task;
+package com.github.ontio.explorer.statistics.task;
 
-import com.github.ontio.explorersummary.common.Utils;
-import com.github.ontio.explorersummary.service.CandidateNodeService;
+import com.github.ontio.explorer.statistics.common.Utils;
+import com.github.ontio.explorer.statistics.service.CandidateNodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
