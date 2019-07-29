@@ -11,8 +11,8 @@
     <groupId>com.github.ontio.explorer</groupId>
     <artifactId>statistics</artifactId>
     <version>1.1.0.RELEASE</version>
-    <name>explorer-summary</name>
-    <description>Demo project for Spring Boot</description>
+    <name>explorer-statistics</name>
+    <description>Statistics project for ontology explorer</description>
 
     <properties>
         <java.version>1.8</java.version>
