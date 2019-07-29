@@ -1,1 +1,1 @@
-# explorer-statistics
+# ontology-explorer-summary
