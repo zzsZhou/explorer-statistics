@@ -19,7 +19,6 @@ import com.alibaba.fastjson.JSON;
 import com.github.ontio.explorer.statistics.common.ConfigParams;
 import com.github.ontio.explorer.statistics.common.Constants;
 import com.github.ontio.explorer.statistics.mapper.*;
-import com.github.ontio.explorersummary.mapper.*;
 import com.github.ontio.explorer.statistics.model.AddressDailySummary;
 import com.github.ontio.explorer.statistics.model.Contract;
 import com.github.ontio.explorer.statistics.model.ContractDailySummary;
