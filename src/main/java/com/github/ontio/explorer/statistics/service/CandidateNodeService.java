@@ -89,7 +89,7 @@ public class CandidateNodeService {
         List<NodeInfoOnChain> nodes = new ArrayList<>();
         for (Object obj : peerPool.values()) {
             PeerPoolItem item = (PeerPoolItem) obj;
-            // consensus nodes and candidate nodes
+            // candidate nodes and consensus nodes
             if (item.status != 1 && item.status != 2) {
                 continue;
             }
