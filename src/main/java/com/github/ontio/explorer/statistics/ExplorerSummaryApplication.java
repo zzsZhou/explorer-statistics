@@ -21,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication
-@tk.mybatis.spring.annotation.MapperScan("com.github.ontio.explorersummary.mapper")
+@tk.mybatis.spring.annotation.MapperScan("com.github.ontio.statistics.mapper")
 public class ExplorerSummaryApplication {
 
     public static void main(String[] args) {
