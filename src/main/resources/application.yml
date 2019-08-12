@@ -22,25 +22,11 @@ server:
     uri-encoding: UTF-8
 
 config:
-  local:
-    host: http://localhost
-    port: 20334
-  main:
-    node: http://dappnode${random.int[1,5]}.ont.io:20334
-    host: http://dappnode
-    abs_path: .ont.io:20334
-    node_index: 1
-    node_count: 4
-  polaris:
-    node: http://polaris${random.int[1,6]}.ont.io:20334
-    host: http://polaris
-    abs_path: .ont.io:20334
-    node_index: 1
-    node_count: 5
-  candidate:
-    info: https://ont.io/api/v1/candidate/info/All
-  detail_url: https://explorer.ont.io/nodes/detail/
-
-
-is:
-  testnet: true
+  hosts:
+    - http://dappnode1.ont.io:20334
+    - http://dappnode2.ont.io:20334
+    - http://dappnode3.ont.io:20334
+    - http://dappnode4.ont.io:20334
+  consensus-node-detail-url: https://explorer.ont.io/nodes/detail/
+  node-map-url: http://localhost:8888/api/nodes
+  is-test-net: false

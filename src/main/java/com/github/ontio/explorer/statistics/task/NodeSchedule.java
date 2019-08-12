@@ -15,8 +15,8 @@
 
 package com.github.ontio.explorer.statistics.task;
 
-import com.github.ontio.explorer.statistics.common.Utils;
-import com.github.ontio.explorer.statistics.service.CandidateNodeService;
+import com.github.ontio.explorer.statistics.service.ConsensusNodeService;
+import com.github.ontio.explorer.statistics.service.NodeMapService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -28,26 +28,39 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class NodeSchedule {
 
-    private final Utils utils;
+    private final NodeMapService nodeMapService;
 
-    private final CandidateNodeService candidateNodeService;
+    private final ConsensusNodeService consensusNodeService;
 
     @Autowired
-    public NodeSchedule(Utils utils, CandidateNodeService candidateNodeService) {
-        this.utils = utils;
-        this.candidateNodeService = candidateNodeService;
+    public NodeSchedule(NodeMapService nodeMapService, ConsensusNodeService consensusNodeService) {
+        this.nodeMapService = nodeMapService;
+        this.consensusNodeService = consensusNodeService;
     }
 
     @Scheduled(fixedDelay = 300000)
     public void updateNodeInfo() {
         try {
-            log.info("Update candida node information task begin at {}", utils.getCurrentTime());
-            candidateNodeService.updateInfo();
-            log.info("Update candida node information task end at {}", utils.getCurrentTime());
+            log.info("Updating consensus node information start");
+            consensusNodeService.updateConsensusNodeInfo();
+            log.info("Updating consensus node information task end");
         } catch (Exception e) {
-            log.warn("An error occur: ", e);
-            log.info("Restart Update candida node information task again at {}", utils.getCurrentTime());
+            log.warn("Updating consensus node information task failed: {}", e.getMessage());
+            log.info("Updating consensus node information task again");
             updateNodeInfo();
+        }
+    }
+
+    @Scheduled(fixedDelay = 30000)
+    public void updateNetNodesInfo() {
+        try {
+            log.info("Updating global network nodes info task begin");
+            nodeMapService.getNodesInfo();
+            log.info("Updating global network nodes info task end");
+        } catch (Exception e) {
+            log.warn("Updating global network nodes info task failed: {}", e.getMessage());
+            log.info("Updating global network nodes task again");
+            updateNetNodesInfo();
         }
     }
 }

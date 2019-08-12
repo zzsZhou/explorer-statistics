@@ -13,13 +13,19 @@
  * along with The ontology.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.ontio.explorer.statistics.common;
+package com.github.ontio.explorer.statistics;
 
-import org.springframework.stereotype.Component;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@Component
-public class Utils {
-    public long getCurrentTime() {
-        return System.currentTimeMillis() / 1000L;
+@EnableScheduling
+@SpringBootApplication
+@tk.mybatis.spring.annotation.MapperScan("com.github.ontio.explorer.statistics.mapper")
+public class ExplorerStatisticsApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ExplorerStatisticsApplication.class, args);
     }
+
 }

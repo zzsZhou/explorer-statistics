@@ -125,5 +125,9 @@
             <generatedKey column="node_rank" sqlStatement="JDBC"/>
         </table>
 
+        <table tableName="tbl_net_node_info" domainObjectName="NetNodeInfo">
+            <generatedKey column="ip" sqlStatement="JDBC"/>
+        </table>
+
     </context>
 </generatorConfiguration>

@@ -15,8 +15,7 @@
 
 package com.github.ontio.explorer.statistics.task;
 
-import com.github.ontio.explorer.statistics.common.Utils;
-import com.github.ontio.explorer.statistics.service.SummaryService;
+import com.github.ontio.explorer.statistics.service.StatisticsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -28,27 +27,24 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class DailyInfoSchedule {
 
-    private final Utils utils;
-
-    private final SummaryService summaryService;
+    private final StatisticsService statisticsService;
 
     @Autowired
-    public DailyInfoSchedule(Utils utils, SummaryService summaryService) {
-        this.utils = utils;
-        this.summaryService = summaryService;
+    public DailyInfoSchedule(StatisticsService statisticsService) {
+        this.statisticsService = statisticsService;
     }
 
     @Scheduled(cron = "0 5 0 * * *")
     public void updateDailyInfo() {
-        log.info("Update daily information task begin at {}", utils.getCurrentTime());
-        summaryService.updateDailySummary();
-        log.info("Update daily information task end at {}", utils.getCurrentTime());
+        log.info("Updating daily information task begin");
+        statisticsService.updateDailySummary();
+        log.info("Updating daily information task end");
     }
 
     @Scheduled(cron = "0 0/30 * * * *")
     public void updateApprovedContractInfo() {
-        log.info("Update approved contract information task begin at {}", utils.getCurrentTime());
-        summaryService.updateApprovedContractInfo();
-        log.info("Update approved contract information task end at {}", utils.getCurrentTime());
+        log.info("Updating approved contract information task begin");
+        statisticsService.updateApprovedContractInfo();
+        log.info("Updating approved contract information task end");
     }
 }

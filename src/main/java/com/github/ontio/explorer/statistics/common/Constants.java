@@ -32,9 +32,4 @@ public class Constants {
 
     public static final String ADDR_DAILY_SUMMARY_NATIVETYPE = "0000000000000000000000000000000000000000";
 
-    public static final String ONT_NODE_URL = "http://localhost:20334";
-
-    public static final String CANDIDATE_DETAIL_URL_PREFIX = "https://explorer.ont.io/nodes/detail/";
-
-    public static final String CANDIDATE_INFO_URL = "https://ont.io/api/v1/candidate/info/All";
 }

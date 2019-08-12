@@ -16,7 +16,7 @@
 package com.github.ontio.explorer.statistics.service;
 
 import com.alibaba.fastjson.JSON;
-import com.github.ontio.explorer.statistics.common.ConfigParams;
+import com.github.ontio.explorer.statistics.common.ParamsConfig;
 import com.github.ontio.explorer.statistics.common.Constants;
 import com.github.ontio.explorer.statistics.mapper.*;
 import com.github.ontio.explorer.statistics.model.AddressDailySummary;
@@ -37,8 +37,8 @@ import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor
-@Service("SummaryService")
-public class SummaryService {
+@Service("StatisticsService")
+public class StatisticsService {
     private BlockMapper blockMapper;
     private TxDetailTmpMapper txDetailTmpMapper;
     private ContractMapper contractMapper;
@@ -47,15 +47,15 @@ public class SummaryService {
     private OntidTxDetailMapper ontidTxDetailMapper;
     private AddressDailySummaryMapper addrDailySummaryMapper;
     private ContractDailySummaryMapper contractDailySummaryMapper;
-    private ConfigParams configParams;
+    private ParamsConfig paramsConfig;
 
 
     @Autowired
-    public SummaryService(BlockMapper blockMapper, TxDetailTmpMapper txDetailTmpMapper,
-                          ContractMapper contractMapper, TxDetailDailyMapper txDetailDailyMapper,
-                          DailySummaryMapper dailySummaryMapper, OntidTxDetailMapper ontidTxDetailMapper,
-                          AddressDailySummaryMapper addrDailySummaryMapper, ContractDailySummaryMapper contractDailySummaryMapper,
-                          ConfigParams configParams) {
+    public StatisticsService(BlockMapper blockMapper, TxDetailTmpMapper txDetailTmpMapper,
+                             ContractMapper contractMapper, TxDetailDailyMapper txDetailDailyMapper,
+                             DailySummaryMapper dailySummaryMapper, OntidTxDetailMapper ontidTxDetailMapper,
+                             AddressDailySummaryMapper addrDailySummaryMapper, ContractDailySummaryMapper contractDailySummaryMapper,
+                             ParamsConfig paramsConfig) {
         this.blockMapper = blockMapper;
         this.txDetailTmpMapper = txDetailTmpMapper;
         this.contractMapper = contractMapper;
@@ -64,7 +64,7 @@ public class SummaryService {
         this.ontidTxDetailMapper = ontidTxDetailMapper;
         this.addrDailySummaryMapper = addrDailySummaryMapper;
         this.contractDailySummaryMapper = contractDailySummaryMapper;
-        this.configParams = configParams;
+        this.paramsConfig = paramsConfig;
     }
 
     public void updateDailySummary() {
@@ -232,12 +232,12 @@ public class SummaryService {
         return addrDailySummaryMapper.selectDistinctAddressByContract(contractHash);
     }
 
-    private int getDailyContractNewAddrCount(String contractHash,int dappStoreFlag) {
+    private int getDailyContractNewAddrCount(String contractHash, int dappStoreFlag) {
         List<String> contractAddrList = new ArrayList<>();
         //dapp类型合约,根据from_address+payer计算地址
-        if(dappStoreFlag == 1){
+        if (dappStoreFlag == 1) {
             contractAddrList = getAddrListFromTxDetailTbl4Dapp(contractHash);
-        }else {
+        } else {
             //其他类型合约,根据from_address+to_address计算地址
             contractAddrList = getAddrListFromTxDetailTbl(contractHash);
         }
@@ -275,15 +275,15 @@ public class SummaryService {
         for (Contract contract : contractList) {
             String type = contract.getType();
             String contractHash = contract.getContractHash();
-            int dappStoreFlag= contract.getDappstoreFlag();
-            log.info("Begin Handle {} contract:{},Name:{},dappStoreFlag:{}", type, contractHash, contract.getName(),dappStoreFlag);
+            int dappStoreFlag = contract.getDappstoreFlag();
+            log.info("Staring handle {} contract {} named {} which dApp store flag is {}", type, contractHash, contract.getName(), dappStoreFlag);
 
             ContractDailySummary contractDailySummary = getContractDailySummary(contractHash);
             contract.setTxCount(contractDailySummary.getTxCount() + getDailyTxCount(contractHash));
             contract.setOntSum(contractDailySummary.getOntSum().add(getDailyOntSum(contractHash)));
             contract.setOngSum(contractDailySummary.getOngSum().add(getDailyOngSum(contractHash)));
             contract.setTokenSum(getOepTokenSum(contractHash, type));
-            contract.setAddressCount(contractDailySummary.getNewAddressCount() + getDailyContractNewAddrCount(contractHash,dappStoreFlag));
+            contract.setAddressCount(contractDailySummary.getNewAddressCount() + getDailyContractNewAddrCount(contractHash, dappStoreFlag));
             contractMapper.updateByPrimaryKeySelective(contract);
         }
     }
@@ -301,9 +301,9 @@ public class SummaryService {
     }
 
     private List<AddressDailySummary> updateDailyContractInfoAndContractNewAddress(Integer beginTime) {
-        List<Contract> contractList = new ArrayList<>();
+        List<Contract> contractList;
         //测试网只更新审核后的合约
-        if (configParams.IS_TESTNET) {
+        if (paramsConfig.getIsTestNet()) {
             contractList = contractMapper.selectAllApprovedContract();
         } else {
             contractList = contractMapper.selectAll();
@@ -320,11 +320,11 @@ public class SummaryService {
             BigDecimal dailyOngAmount = getOneDayOngSum(contractHash);
             int dailyTxCount = getDailyTxSum(contractHash);
 
-            List<String> dailyActiveAddress = new ArrayList<>();
+            List<String> dailyActiveAddress;
             //dapp类型合约,根据from_address+payer计算地址
-            if(contract.getDappstoreFlag() == 1){
+            if (contract.getDappstoreFlag() == 1) {
                 dailyActiveAddress = txDetailTmpMapper.selectContractAddr4Dapp(contractHash);
-            }else {
+            } else {
                 //其他类型合约,根据from_address+to_address计算地址
                 dailyActiveAddress = txDetailTmpMapper.selectContractAddr(contractHash);
             }
