@@ -1,7 +1,9 @@
 package com.github.ontio.explorer.statistics.service;
 
 import com.github.ontio.OntSdk;
+import com.github.ontio.core.governance.GovernanceView;
 import com.github.ontio.explorer.statistics.common.ParamsConfig;
+import com.github.ontio.network.exception.ConnectorException;
 import com.github.ontio.sdk.exception.SDKException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.net.ConnectException;
+import java.nio.file.LinkOption;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
@@ -38,7 +43,29 @@ public class OntSdkService {
         }
     }
 
-    public void switchSyncNode() {
+    GovernanceView getGovernanceView() {
+        try {
+            return sdk.nativevm().governance().getGovernanceView();
+        } catch (ConnectorException | IOException | SDKException e) {
+            log.warn("Getting governance view failed: {}", e.getMessage());
+            switchSyncNode();
+            log.info("Getting governance view again");
+            return getGovernanceView();
+        }
+    }
+
+    int getBlockHeight() {
+        try {
+            return sdk.getRestful().getBlockHeight();
+        } catch (ConnectorException | IOException | SDKException e) {
+            log.warn("Getting block height failed: {}", e.getMessage());
+            switchSyncNode();
+            log.info("Getting block height again");
+            return getBlockHeight();
+        }
+    }
+
+    void switchSyncNode() {
         if (currentNodeIndex.get() >= nodeCount) {
             currentNodeIndex.set(0);
         }

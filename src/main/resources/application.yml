@@ -8,6 +8,13 @@ spring:
       charset: UTF-8
   profiles:
     active: dev
+  task:
+    scheduling:
+      pool:
+        size: 8
+      thread-name-prefix: "explorer-task-"
+
+
 
 mybatis:
   check-config-location: true

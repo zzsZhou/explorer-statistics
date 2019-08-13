@@ -51,7 +51,7 @@ public class NodeSchedule {
         }
     }
 
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedDelay = 20000)
     public void updateNetNodesInfo() {
         try {
             log.info("Updating global network nodes info task begin");
@@ -60,6 +60,19 @@ public class NodeSchedule {
         } catch (Exception e) {
             log.warn("Updating global network nodes info task failed: {}", e.getMessage());
             log.info("Updating global network nodes task again");
+            updateNetNodesInfo();
+        }
+    }
+
+    @Scheduled(fixedDelay = 1000)
+    public void updateBlockCountToNextRound() {
+        try {
+            log.info("Updating block count to next round task begin");
+            consensusNodeService.updateBlockCountToNextRound();
+            log.info("Updating block count to next round task end");
+        } catch (Exception e) {
+            log.warn("Updating block count to next round failed: {}", e.getMessage());
+            log.info("Updating block count to next round again");
             updateNetNodesInfo();
         }
     }

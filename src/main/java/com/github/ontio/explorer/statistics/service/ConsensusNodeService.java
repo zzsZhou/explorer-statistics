@@ -18,11 +18,14 @@ package com.github.ontio.explorer.statistics.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ontio.OntSdk;
+import com.github.ontio.core.governance.GovernanceView;
 import com.github.ontio.core.governance.PeerPoolItem;
 import com.github.ontio.explorer.statistics.common.ParamsConfig;
 import com.github.ontio.explorer.statistics.mapper.NodeInfoOffChainMapper;
 import com.github.ontio.explorer.statistics.mapper.NodeInfoOnChainMapper;
+import com.github.ontio.explorer.statistics.mapper.NodeOverviewMapper;
 import com.github.ontio.explorer.statistics.model.NodeInfoOnChain;
+import com.github.ontio.explorer.statistics.model.NodeOverview;
 import com.github.ontio.sdk.exception.SDKException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +46,8 @@ public class ConsensusNodeService {
 
     private ObjectMapper objectMapper;
 
+    private NodeOverviewMapper nodeOverviewMapper;
+
     private NodeInfoOnChainMapper nodeInfoOnChainMapper;
 
     private NodeInfoOffChainMapper nodeInfoOffChainMapper;
@@ -53,13 +58,38 @@ public class ConsensusNodeService {
     public ConsensusNodeService(ParamsConfig paramsConfig,
                                 ObjectMapper objectMapper,
                                 OntSdkService ontSdkService,
+                                NodeOverviewMapper nodeOverviewMapper,
                                 NodeInfoOnChainMapper nodeInfoOnChainMapper,
                                 NodeInfoOffChainMapper nodeInfoOffChainMapper) {
         this.paramsConfig = paramsConfig;
         this.ontSdkService = ontSdkService;
         this.objectMapper = objectMapper;
+        this.nodeOverviewMapper = nodeOverviewMapper;
         this.nodeInfoOnChainMapper = nodeInfoOnChainMapper;
         this.nodeInfoOffChainMapper = nodeInfoOffChainMapper;
+    }
+
+    public void updateBlockCountToNextRound() {
+        long blockCntToNxtRound = getBlockCountToNextRound();
+        if (blockCntToNxtRound < 0) {
+            return;
+        }
+        try {
+            nodeOverviewMapper.updateBlkCntToNxtRnd(blockCntToNxtRound);
+            log.info("Updating block count to next round with value {}", blockCntToNxtRound);
+        } catch (Exception e) {
+            log.warn("Updating block count to next round with value {} failed: {}", blockCntToNxtRound, e.getMessage());
+        }
+    }
+
+    private long getBlockCountToNextRound() {
+        GovernanceView view = ontSdkService.getGovernanceView();
+        if (view == null) {
+            log.warn("Getting governance view in consensus node service failed:");
+            return -1;
+        }
+        long blockHeight = ontSdkService.getBlockHeight();
+        return 120000 - (blockHeight - view.height);
     }
 
     public void updateConsensusNodeInfo() {
