@@ -113,10 +113,6 @@
             <generatedKey column="id" sqlStatement="JDBC"/>
         </table>
 
-        <table tableName="tbl_candidate_node_summary" domainObjectName="CandidateNodeSummary">
-            <generatedKey column="id" sqlStatement="JDBC"/>
-        </table>
-
         <table tableName="tbl_node_info_off_chain" domainObjectName="NodeInfoOffChain">
             <generatedKey column="public_key" sqlStatement="JDBC"/>
         </table>
