@@ -48,14 +48,19 @@ public class NodeInfoOnChain {
     @Column(name = "node_proportion")
     private String nodeProportion;
 
+    @Column(name = "current_stake_percentage")
+    private String currentStakePercentage;
+
     // Self-defined construct method.
     public NodeInfoOnChain(PeerPoolItem item) {
         this.name = "";
-        publicKey = item.peerPubkey;
-        address = item.address.toBase58();
-        status = item.status;
-        initPos = item.initPos;
-        totalPos = item.totalPos;
-        nodeProportion = "";
+        this.publicKey = item.peerPubkey;
+        this.address = item.address.toBase58();
+        this.status = item.status;
+        this.initPos = item.initPos;
+        this.totalPos = item.totalPos;
+        this.nodeProportion = "";
+        this.currentStakePercentage = "";
+
     }
 }

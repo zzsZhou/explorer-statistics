@@ -38,7 +38,7 @@ public class NodeSchedule {
         this.consensusNodeService = consensusNodeService;
     }
 
-    @Scheduled(fixedDelay = 300000)
+    @Scheduled(fixedDelay = 30000000)
     public void updateNodeInfo() {
         try {
             log.info("Updating consensus node information start");
@@ -51,7 +51,7 @@ public class NodeSchedule {
         }
     }
 
-    @Scheduled(fixedDelay = 20000)
+    @Scheduled(fixedDelay = 60000)
     public void updateNetNodesInfo() {
         try {
             log.info("Updating global network nodes info task begin");
