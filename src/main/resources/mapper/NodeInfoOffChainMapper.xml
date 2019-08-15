@@ -17,6 +17,7 @@
     <result column="latitude" jdbcType="DECIMAL" property="latitude" />
     <result column="ip" jdbcType="VARCHAR" property="ip" />
     <result column="website" jdbcType="VARCHAR" property="website" />
+    <result column="social_medium" jdbcType="VARCHAR" property="socialMedium">
   </resultMap>
   <!--
   self-defined SQL
