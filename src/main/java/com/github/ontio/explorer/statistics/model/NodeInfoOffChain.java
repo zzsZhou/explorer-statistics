@@ -44,4 +44,7 @@ public class NodeInfoOffChain {
 
     private String website;
 
+    @Column(name = "social_media")
+    private String socialMedia;
+
 }
