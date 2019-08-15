@@ -64,7 +64,7 @@ public class NodeSchedule {
         }
     }
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 4000)
     public void updateBlockCountToNextRound() {
         try {
             log.info("Updating block count to next round task begin");
@@ -72,8 +72,6 @@ public class NodeSchedule {
             log.info("Updating block count to next round task end");
         } catch (Exception e) {
             log.warn("Updating block count to next round failed: {}", e.getMessage());
-            log.info("Updating block count to next round again");
-            updateNetNodesInfo();
         }
     }
 }

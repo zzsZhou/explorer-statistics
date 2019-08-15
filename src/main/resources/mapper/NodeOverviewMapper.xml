@@ -12,7 +12,6 @@
     <select id="updateBlkCntToNxtRnd" parameterType="java.lang.Long">
         UPDATE tbl_node_overview
         SET blk_cnt_to_nxt_rnd = #{blkCntToNxtRnd}
-        WHERE id = 1
-          AND blk_cnt_to_nxt_rnd &gt; #{blkCntToNxtRnd};
+        WHERE id = 1;
     </select>
 </mapper>
