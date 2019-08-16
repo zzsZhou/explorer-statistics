@@ -24,7 +24,10 @@ import com.github.ontio.explorer.statistics.common.ParamsConfig;
 import com.github.ontio.explorer.statistics.mapper.NodeInfoOffChainMapper;
 import com.github.ontio.explorer.statistics.mapper.NodeInfoOnChainMapper;
 import com.github.ontio.explorer.statistics.mapper.NodeOverviewMapper;
+import com.github.ontio.explorer.statistics.mapper.NodePositionHistoryMapper;
+import com.github.ontio.explorer.statistics.model.NodeInfoOffChain;
 import com.github.ontio.explorer.statistics.model.NodeInfoOnChain;
+import com.github.ontio.explorer.statistics.model.NodePositionHistory;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +53,8 @@ public class ConsensusNodeService {
 
     private NodeInfoOffChainMapper nodeInfoOffChainMapper;
 
+    private NodePositionHistoryMapper nodePositionHistoryMapper;
+
     private OntSdkService ontSdkService;
 
     @Autowired
@@ -58,13 +63,15 @@ public class ConsensusNodeService {
                                 OntSdkService ontSdkService,
                                 NodeOverviewMapper nodeOverviewMapper,
                                 NodeInfoOnChainMapper nodeInfoOnChainMapper,
-                                NodeInfoOffChainMapper nodeInfoOffChainMapper) {
+                                NodeInfoOffChainMapper nodeInfoOffChainMapper,
+                                NodePositionHistoryMapper nodePositionHistoryMapper) {
         this.paramsConfig = paramsConfig;
         this.ontSdkService = ontSdkService;
         this.objectMapper = objectMapper;
         this.nodeOverviewMapper = nodeOverviewMapper;
         this.nodeInfoOnChainMapper = nodeInfoOnChainMapper;
         this.nodeInfoOffChainMapper = nodeInfoOffChainMapper;
+        this.nodePositionHistoryMapper = nodePositionHistoryMapper;
     }
 
     public void updateBlockCountToNextRound() {
@@ -77,6 +84,52 @@ public class ConsensusNodeService {
             log.info("Updating block count to next round with value {}", blockCntToNxtRound);
         } catch (Exception e) {
             log.warn("Updating block count to next round with value {} failed: {}", blockCntToNxtRound, e.getMessage());
+        }
+    }
+
+    private void initNodePositionHistory() {
+        GovernanceView view = ontSdkService.getGovernanceView();
+        if (view == null) {
+            log.warn("Getting governance view in consensus node service failed:");
+            return;
+        }
+        long currentRoundBlockHeight = view.height - paramsConfig.getNewStakingRoundBlockCount();
+        updateNodePositionHistoryFromNodeInfoOnChain(currentRoundBlockHeight);
+    }
+
+    private void updateNodePositionHistoryFromNodeInfoOnChain(long currentRoundBlockHeight) {
+        log.info("Updating node position history from node info on chain task begin");
+        List<NodeInfoOnChain> nodeInfoOnChainList = nodeInfoOnChainMapper.selectAll();
+        List<NodePositionHistory> nodePositionHistoryList = new ArrayList<>();
+        for (NodeInfoOnChain node : nodeInfoOnChainList) {
+            nodePositionHistoryList.add(new NodePositionHistory(node, currentRoundBlockHeight));
+        }
+        try {
+            nodePositionHistoryMapper.batchInsertSelective(nodePositionHistoryList);
+            log.info("Updating node position history from node info on chain task end");
+        } catch (Exception e) {
+            log.info("Updating node position history from node info on chain task failed: {}", e.getMessage());
+        }
+    }
+
+    public void updateNodePositionHistory() {
+        long lastRoundBlockHeight;
+        try {
+            lastRoundBlockHeight = nodePositionHistoryMapper.selectLatestBlockHeight();
+        } catch (NullPointerException e) {
+            initNodePositionHistory();
+            return;
+        }
+        try {
+            long blockHeight = ontSdkService.getBlockHeight();
+            long nextRoundBlockHeight = lastRoundBlockHeight + paramsConfig.getNewStakingRoundBlockCount();
+            if (nextRoundBlockHeight > blockHeight) {
+                log.info("Current block height is {}, next round block height should be {} ", blockHeight, nextRoundBlockHeight);
+                return;
+            }
+            updateNodePositionHistoryFromNodeInfoOnChain(nextRoundBlockHeight);
+        } catch (Exception e) {
+            log.warn("Updating node position history failed {}", e.getMessage());
         }
     }
 

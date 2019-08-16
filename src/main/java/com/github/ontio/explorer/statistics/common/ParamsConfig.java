@@ -24,4 +24,6 @@ public class ParamsConfig {
 
     private Boolean isTestNet;
 
+    private Long newStakingRoundBlockCount;
+
 }
