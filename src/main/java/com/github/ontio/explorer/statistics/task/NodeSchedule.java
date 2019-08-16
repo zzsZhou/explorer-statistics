@@ -19,6 +19,8 @@ import com.github.ontio.explorer.statistics.service.ConsensusNodeService;
 import com.github.ontio.explorer.statistics.service.NodeMapService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableScheduling
+@EnableConfigurationProperties
+@ConfigurationProperties(prefix = "node-schedule-task")
 public class NodeSchedule {
 
     private final NodeMapService nodeMapService;
@@ -33,12 +37,13 @@ public class NodeSchedule {
     private final ConsensusNodeService consensusNodeService;
 
     @Autowired
-    public NodeSchedule(NodeMapService nodeMapService, ConsensusNodeService consensusNodeService) {
+    public NodeSchedule(NodeMapService nodeMapService,
+                        ConsensusNodeService consensusNodeService) {
         this.nodeMapService = nodeMapService;
         this.consensusNodeService = consensusNodeService;
     }
 
-//    @Scheduled(fixedDelay = 30000000)
+    @Scheduled(fixedDelayString = "${node-schedule-task.update-on-chain-info}")
     public void updateNodeInfo() {
         try {
             log.info("Updating consensus node information start");
@@ -51,7 +56,7 @@ public class NodeSchedule {
         }
     }
 
-//    @Scheduled(fixedDelay = 600000)
+    @Scheduled(fixedDelayString = "${node-schedule-task.update-net-nodes-info}")
     public void updateNetNodesInfo() {
         try {
             log.info("Updating global network nodes info task begin");
@@ -64,7 +69,7 @@ public class NodeSchedule {
         }
     }
 
-//    @Scheduled(fixedDelay = 4000)
+    @Scheduled(fixedDelayString = "${node-schedule-task.update-block-count-to-next-round}")
     public void updateBlockCountToNextRound() {
         try {
             log.info("Updating block count to next round task begin");
@@ -75,7 +80,7 @@ public class NodeSchedule {
         }
     }
 
-    @Scheduled(fixedDelay = 6000000)
+    @Scheduled(fixedDelayString = "${node-schedule-task.update-node-position-history}")
     public void updateNodePositionHistory() {
         try {
             log.info("Updating node position history task begin");

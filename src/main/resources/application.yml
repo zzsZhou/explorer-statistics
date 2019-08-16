@@ -35,3 +35,10 @@ config:
   node-map-url: http://52.77.140.175:8888/api/nodes
   is-test-net: false
   new-staking-round-block-count: 120000
+
+node-schedule-task:
+  update-on-chain-info: 30000000
+  update-net-nodes-info: 3600000
+  update-block-count-to-next-round: 6000
+  update-node-position-history: 10800000
+
