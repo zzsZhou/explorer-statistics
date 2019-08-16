@@ -38,7 +38,7 @@ public class NodeSchedule {
         this.consensusNodeService = consensusNodeService;
     }
 
-    @Scheduled(fixedDelay = 30000000)
+//    @Scheduled(fixedDelay = 30000000)
     public void updateNodeInfo() {
         try {
             log.info("Updating consensus node information start");
@@ -51,7 +51,7 @@ public class NodeSchedule {
         }
     }
 
-    @Scheduled(fixedDelay = 600000)
+//    @Scheduled(fixedDelay = 600000)
     public void updateNetNodesInfo() {
         try {
             log.info("Updating global network nodes info task begin");
@@ -64,7 +64,7 @@ public class NodeSchedule {
         }
     }
 
-    @Scheduled(fixedDelay = 4000)
+//    @Scheduled(fixedDelay = 4000)
     public void updateBlockCountToNextRound() {
         try {
             log.info("Updating block count to next round task begin");
@@ -85,4 +85,5 @@ public class NodeSchedule {
             log.warn("Updating node position history failed: {}", e.getMessage());
         }
     }
+
 }

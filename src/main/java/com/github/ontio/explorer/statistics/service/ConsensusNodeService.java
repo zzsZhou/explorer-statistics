@@ -17,17 +17,13 @@ package com.github.ontio.explorer.statistics.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.ontio.OntSdk;
 import com.github.ontio.core.governance.GovernanceView;
 import com.github.ontio.core.governance.PeerPoolItem;
 import com.github.ontio.explorer.statistics.common.ParamsConfig;
-import com.github.ontio.explorer.statistics.mapper.NodeInfoOffChainMapper;
-import com.github.ontio.explorer.statistics.mapper.NodeInfoOnChainMapper;
-import com.github.ontio.explorer.statistics.mapper.NodeOverviewMapper;
-import com.github.ontio.explorer.statistics.mapper.NodePositionHistoryMapper;
-import com.github.ontio.explorer.statistics.model.NodeInfoOffChain;
+import com.github.ontio.explorer.statistics.mapper.*;
 import com.github.ontio.explorer.statistics.model.NodeInfoOnChain;
-import com.github.ontio.explorer.statistics.model.NodePositionHistory;
+import com.github.ontio.explorer.statistics.model.NodeRankChange;
+import com.github.ontio.explorer.statistics.model.NodeRankHistory;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +45,13 @@ public class ConsensusNodeService {
 
     private NodeOverviewMapper nodeOverviewMapper;
 
+    private NodeRankChangeMapper nodeRankChangeMapper;
+
     private NodeInfoOnChainMapper nodeInfoOnChainMapper;
 
-    private NodeInfoOffChainMapper nodeInfoOffChainMapper;
+    private NodeRankHistoryMapper nodeRankHistoryMapper;
 
-    private NodePositionHistoryMapper nodePositionHistoryMapper;
+    private NodeInfoOffChainMapper nodeInfoOffChainMapper;
 
     private OntSdkService ontSdkService;
 
@@ -62,16 +60,18 @@ public class ConsensusNodeService {
                                 ObjectMapper objectMapper,
                                 OntSdkService ontSdkService,
                                 NodeOverviewMapper nodeOverviewMapper,
+                                NodeRankChangeMapper nodeRankChangeMapper,
                                 NodeInfoOnChainMapper nodeInfoOnChainMapper,
-                                NodeInfoOffChainMapper nodeInfoOffChainMapper,
-                                NodePositionHistoryMapper nodePositionHistoryMapper) {
+                                NodeRankHistoryMapper nodeRankHistoryMapper,
+                                NodeInfoOffChainMapper nodeInfoOffChainMapper) {
         this.paramsConfig = paramsConfig;
         this.ontSdkService = ontSdkService;
         this.objectMapper = objectMapper;
         this.nodeOverviewMapper = nodeOverviewMapper;
+        this.nodeRankChangeMapper = nodeRankChangeMapper;
         this.nodeInfoOnChainMapper = nodeInfoOnChainMapper;
+        this.nodeRankHistoryMapper = nodeRankHistoryMapper;
         this.nodeInfoOffChainMapper = nodeInfoOffChainMapper;
-        this.nodePositionHistoryMapper = nodePositionHistoryMapper;
     }
 
     public void updateBlockCountToNextRound() {
@@ -100,29 +100,61 @@ public class ConsensusNodeService {
     private void updateNodePositionHistoryFromNodeInfoOnChain(long currentRoundBlockHeight) {
         log.info("Updating node position history from node info on chain task begin");
         List<NodeInfoOnChain> nodeInfoOnChainList = nodeInfoOnChainMapper.selectAll();
-        List<NodePositionHistory> nodePositionHistoryList = new ArrayList<>();
+        List<NodeRankHistory> nodePositionHistoryList = new ArrayList<>();
         for (NodeInfoOnChain node : nodeInfoOnChainList) {
-            nodePositionHistoryList.add(new NodePositionHistory(node, currentRoundBlockHeight));
+            nodePositionHistoryList.add(new NodeRankHistory(node, currentRoundBlockHeight));
         }
         try {
-            nodePositionHistoryMapper.batchInsertSelective(nodePositionHistoryList);
+            nodeRankHistoryMapper.batchInsertSelective(nodePositionHistoryList);
             log.info("Updating node position history from node info on chain task end");
+            updateNodeRankChange();
         } catch (Exception e) {
             log.info("Updating node position history from node info on chain task failed: {}", e.getMessage());
         }
     }
 
-    public void updateNodePositionHistory() {
-        long lastRoundBlockHeight;
+    private void updateNodeRankChange() {
         try {
-            lastRoundBlockHeight = nodePositionHistoryMapper.selectLatestBlockHeight();
+            log.info("Updating node rank change task begin");
+            long currentRoundBlockHeight = nodeRankHistoryMapper.selectCurrentRoundBlockHeight();
+            long lastRoundBlockHeight = currentRoundBlockHeight - paramsConfig.getNewStakingRoundBlockCount();
+
+            List<NodeRankHistory> currentNodePositionList = nodeRankHistoryMapper.selectNodeRankHistoryListByBlockHeight(currentRoundBlockHeight);
+            if (currentNodePositionList == null) {
+                log.warn("Selecting current round node rank in height {} failed", currentRoundBlockHeight);
+                return;
+            }
+            for (NodeRankHistory currentRoundNode : currentNodePositionList) {
+                NodeRankHistory lastRoundNodeRank = nodeRankHistoryMapper.selectNodeRankHistoryByPublicKeyAndBlockHeight(currentRoundNode.getPublicKey(), lastRoundBlockHeight);
+                int rankChange = 0;
+                if (lastRoundNodeRank != null) {
+                    rankChange = currentRoundNode.getNodeRank() - lastRoundNodeRank.getNodeRank();
+                }
+                NodeRankChange nodeRankChange = NodeRankChange.builder()
+                        .name(currentRoundNode.getName())
+                        .address(currentRoundNode.getAddress())
+                        .rankChange(rankChange)
+                        .publicKey(currentRoundNode.getPublicKey())
+                        .build();
+                nodeRankChangeMapper.insert(nodeRankChange);
+            }
+            log.info("Updating node rank change task end");
+        } catch (Exception e) {
+            log.info("Updating node rank change failed: {}", e.getMessage());
+        }
+    }
+
+    public void updateNodePositionHistory() {
+        long currentRoundBlockHeight;
+        try {
+            currentRoundBlockHeight = nodeRankHistoryMapper.selectCurrentRoundBlockHeight();
         } catch (NullPointerException e) {
             initNodePositionHistory();
             return;
         }
         try {
             long blockHeight = ontSdkService.getBlockHeight();
-            long nextRoundBlockHeight = lastRoundBlockHeight + paramsConfig.getNewStakingRoundBlockCount();
+            long nextRoundBlockHeight = currentRoundBlockHeight + paramsConfig.getNewStakingRoundBlockCount();
             if (nextRoundBlockHeight > blockHeight) {
                 log.info("Current block height is {}, next round block height should be {} ", blockHeight, nextRoundBlockHeight);
                 return;

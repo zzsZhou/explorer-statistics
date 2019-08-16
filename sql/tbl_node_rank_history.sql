@@ -1,7 +1,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS `tbl_node_position_history`;
-CREATE TABLE IF NOT EXISTS `tbl_node_position_history`
+DROP TABLE IF EXISTS `tbl_node_rank_history`;
+CREATE TABLE IF NOT EXISTS `tbl_node_rank_history`
 (
     public_key   VARCHAR(70) NOT NULL,
     address      VARCHAR(34) NOT NULL,

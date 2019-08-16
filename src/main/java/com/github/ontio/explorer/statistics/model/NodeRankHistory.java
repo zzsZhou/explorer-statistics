@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tbl_node_position_history")
-public class NodePositionHistory {
+@Table(name = "tbl_node_rank_history")
+public class NodeRankHistory {
     @Id
     @Column(name = "public_key")
     @GeneratedValue(generator = "JDBC")
@@ -29,12 +29,11 @@ public class NodePositionHistory {
     @Column(name = "node_rank")
     private Integer nodeRank;
 
-    public NodePositionHistory(NodeInfoOnChain nodeInfoOnChain, long blockHeight) {
+    public NodeRankHistory(NodeInfoOnChain nodeInfoOnChain, long blockHeight) {
         this.publicKey = nodeInfoOnChain.getPublicKey();
         this.blockHeight = blockHeight;
         this.address = nodeInfoOnChain.getAddress();
         this.name = nodeInfoOnChain.getName();
         this.nodeRank = nodeInfoOnChain.getNodeRank();
     }
-
 }
