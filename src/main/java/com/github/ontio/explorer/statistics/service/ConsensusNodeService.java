@@ -144,7 +144,7 @@ public class ConsensusNodeService {
         }
     }
 
-    public void updateNodePositionHistory() {
+    public void updateNodeRankHistory() {
         long currentRoundBlockHeight;
         try {
             currentRoundBlockHeight = nodeRankHistoryMapper.selectCurrentRoundBlockHeight();
