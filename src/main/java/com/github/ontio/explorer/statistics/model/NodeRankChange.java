@@ -25,4 +25,7 @@ public class NodeRankChange {
     @Column(name = "rank_change")
     private Integer rankChange;
 
+    @Column(name = "change_block_height")
+    private Long changeBlockHeight;
+
 }

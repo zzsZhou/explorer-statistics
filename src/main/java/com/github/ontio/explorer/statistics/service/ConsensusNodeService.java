@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -87,44 +86,23 @@ public class ConsensusNodeService {
         }
     }
 
-    private void initNodePositionHistory() {
-        GovernanceView view = ontSdkService.getGovernanceView();
-        if (view == null) {
-            log.warn("Getting governance view in consensus node service failed:");
-            return;
-        }
-        long currentRoundBlockHeight = view.height - paramsConfig.getNewStakingRoundBlockCount();
-        updateNodePositionHistoryFromNodeInfoOnChain(currentRoundBlockHeight);
-    }
-
-    private void updateNodePositionHistoryFromNodeInfoOnChain(long currentRoundBlockHeight) {
-        log.info("Updating node position history from node info on chain task begin");
-        List<NodeInfoOnChain> nodeInfoOnChainList = nodeInfoOnChainMapper.selectAll();
-        List<NodeRankHistory> nodePositionHistoryList = new ArrayList<>();
-        for (NodeInfoOnChain node : nodeInfoOnChainList) {
-            nodePositionHistoryList.add(new NodeRankHistory(node, currentRoundBlockHeight));
-        }
+    public void updateNodeRankChange() {
         try {
-            nodeRankHistoryMapper.batchInsertSelective(nodePositionHistoryList);
-            log.info("Updating node position history from node info on chain task end");
-            updateNodeRankChange();
-        } catch (Exception e) {
-            log.info("Updating node position history from node info on chain task failed: {}", e.getMessage());
-        }
-    }
-
-    private void updateNodeRankChange() {
-        try {
-            log.info("Updating node rank change task begin");
+            Long rankChangeBlockHeight = nodeRankChangeMapper.selectRankChangeBlockHeight();
             long currentRoundBlockHeight = nodeRankHistoryMapper.selectCurrentRoundBlockHeight();
+            if (rankChangeBlockHeight != null && rankChangeBlockHeight >= currentRoundBlockHeight) {
+                log.info("Current round block height is {}, rank change block height is {}, no need to update", currentRoundBlockHeight, rankChangeBlockHeight);
+                return;
+            }
             long lastRoundBlockHeight = currentRoundBlockHeight - paramsConfig.getNewStakingRoundBlockCount();
-
-            List<NodeRankHistory> currentNodePositionList = nodeRankHistoryMapper.selectNodeRankHistoryListByBlockHeight(currentRoundBlockHeight);
-            if (currentNodePositionList == null) {
+            List<NodeRankHistory> currentNodeRankList = nodeRankHistoryMapper.selectNodeRankHistoryListByBlockHeight(currentRoundBlockHeight);
+            if (currentNodeRankList == null) {
                 log.warn("Selecting current round node rank in height {} failed", currentRoundBlockHeight);
                 return;
             }
-            for (NodeRankHistory currentRoundNode : currentNodePositionList) {
+            int result = nodeRankChangeMapper.deleteAll();
+            log.warn("Delete {} records in node rank history", result);
+            for (NodeRankHistory currentRoundNode : currentNodeRankList) {
                 NodeRankHistory lastRoundNodeRank = nodeRankHistoryMapper.selectNodeRankHistoryByPublicKeyAndBlockHeight(currentRoundNode.getPublicKey(), lastRoundBlockHeight);
                 int rankChange = 0;
                 if (lastRoundNodeRank != null) {
@@ -135,12 +113,12 @@ public class ConsensusNodeService {
                         .address(currentRoundNode.getAddress())
                         .rankChange(rankChange)
                         .publicKey(currentRoundNode.getPublicKey())
+                        .changeBlockHeight(currentRoundNode.getBlockHeight())
                         .build();
                 nodeRankChangeMapper.insert(nodeRankChange);
             }
-            log.info("Updating node rank change task end");
         } catch (Exception e) {
-            log.info("Updating node rank change failed: {}", e.getMessage());
+            log.warn("Updating node rank change failed: {}", e.getMessage());
         }
     }
 
@@ -149,7 +127,7 @@ public class ConsensusNodeService {
         try {
             currentRoundBlockHeight = nodeRankHistoryMapper.selectCurrentRoundBlockHeight();
         } catch (NullPointerException e) {
-            initNodePositionHistory();
+            initNodeRankHistory();
             return;
         }
         try {
@@ -159,9 +137,34 @@ public class ConsensusNodeService {
                 log.info("Current block height is {}, next round block height should be {} ", blockHeight, nextRoundBlockHeight);
                 return;
             }
-            updateNodePositionHistoryFromNodeInfoOnChain(nextRoundBlockHeight);
+            updateNodeRankHistoryFromNodeInfoOnChain(nextRoundBlockHeight);
         } catch (Exception e) {
             log.warn("Updating node position history failed {}", e.getMessage());
+        }
+    }
+
+    private void initNodeRankHistory() {
+        GovernanceView view = ontSdkService.getGovernanceView();
+        if (view == null) {
+            log.warn("Getting governance view in consensus node service failed:");
+            return;
+        }
+        long currentRoundBlockHeight = view.height - paramsConfig.getNewStakingRoundBlockCount();
+        updateNodeRankHistoryFromNodeInfoOnChain(currentRoundBlockHeight);
+    }
+
+    private void updateNodeRankHistoryFromNodeInfoOnChain(long currentRoundBlockHeight) {
+        log.info("Updating node position history from node info on chain task begin");
+        List<NodeInfoOnChain> nodeInfoOnChainList = nodeInfoOnChainMapper.selectAll();
+        List<NodeRankHistory> nodePositionHistoryList = new ArrayList<>();
+        for (NodeInfoOnChain node : nodeInfoOnChainList) {
+            nodePositionHistoryList.add(new NodeRankHistory(node, currentRoundBlockHeight));
+        }
+        try {
+            nodeRankHistoryMapper.batchInsertSelective(nodePositionHistoryList);
+            log.info("Updating node position history from node info on chain task end");
+        } catch (Exception e) {
+            log.info("Updating node position history from node info on chain task failed: {}", e.getMessage());
         }
     }
 

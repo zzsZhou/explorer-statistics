@@ -54,5 +54,5 @@ config:
 node-schedule-task:
   update-on-chain-info: 30000000
   update-net-nodes-info: 3600000
-  update-block-count-to-next-round: 6000
+  update-block-count-to-next-round: 10000
   update-node-rank-history: 10800000

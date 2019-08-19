@@ -83,9 +83,12 @@ public class NodeSchedule {
     @Scheduled(fixedDelayString = "${node-schedule-task.update-node-rank-history}")
     public void updateNodeRankHistory() {
         try {
-            log.info("Updating node position history task begin");
+            log.info("Updating node rank history task begin");
             consensusNodeService.updateNodeRankHistory();
-            log.info("Updating node position history task end");
+            log.info("Updating node rank history task end");
+            log.info("Updating node rank change task begin");
+            consensusNodeService.updateNodeRankChange();
+            log.info("Updating node rank change task end");
         } catch (Exception e) {
             log.warn("Updating node position history failed: {}", e.getMessage());
         }
