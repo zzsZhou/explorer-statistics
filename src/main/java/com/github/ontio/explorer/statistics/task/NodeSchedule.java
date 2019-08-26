@@ -56,7 +56,7 @@ public class NodeSchedule {
         }
     }
 
-    @Scheduled(fixedDelayString = "${node-schedule-task.update-net-nodes-info}")
+    @Scheduled(cron = "${node-schedule-task.update-net-nodes-info}")
     public void updateNetNodesInfo() {
         try {
             log.info("Updating global network nodes info task begin");
