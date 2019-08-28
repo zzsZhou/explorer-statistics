@@ -89,20 +89,21 @@ public class ConsensusNodeService {
     public void updateNodeRankChange() {
         try {
             Long rankChangeBlockHeight = nodeRankChangeMapper.selectRankChangeBlockHeight();
-            long currentRoundBlockHeight = nodeRankHistoryMapper.selectCurrentRoundBlockHeight();
-            if (rankChangeBlockHeight != null && rankChangeBlockHeight >= currentRoundBlockHeight) {
-                log.info("Current round block height is {}, rank change block height is {}, no need to update", currentRoundBlockHeight, rankChangeBlockHeight);
+            long currentBlockHeight = ontSdkService.getBlockHeight();
+            if (rankChangeBlockHeight != null && rankChangeBlockHeight >= currentBlockHeight) {
+                log.info("Current block height is {}, rank change block height is {}, no need to update", currentBlockHeight, rankChangeBlockHeight);
                 return;
             }
-            long lastRoundBlockHeight = currentRoundBlockHeight - paramsConfig.getNewStakingRoundBlockCount();
-            List<NodeRankHistory> currentNodeRankList = nodeRankHistoryMapper.selectNodeRankHistoryListByBlockHeight(currentRoundBlockHeight);
-            if (currentNodeRankList == null) {
-                log.warn("Selecting current round node rank in height {} failed", currentRoundBlockHeight);
+
+            long lastRoundBlockHeight = nodeRankHistoryMapper.selectCurrentRoundBlockHeight();
+            List<NodeInfoOnChain> currentNodeInfoOnChain = nodeInfoOnChainMapper.selectAll();
+            if (currentNodeInfoOnChain == null) {
+                log.warn("Selecting current node rank in height {} failed", currentBlockHeight);
                 return;
             }
             int result = nodeRankChangeMapper.deleteAll();
             log.warn("Delete {} records in node rank history", result);
-            for (NodeRankHistory currentRoundNode : currentNodeRankList) {
+            for (NodeInfoOnChain currentRoundNode : currentNodeInfoOnChain) {
                 NodeRankHistory lastRoundNodeRank = nodeRankHistoryMapper.selectNodeRankHistoryByPublicKeyAndBlockHeight(currentRoundNode.getPublicKey(), lastRoundBlockHeight);
                 int rankChange = 0;
                 if (lastRoundNodeRank != null) {
@@ -113,7 +114,7 @@ public class ConsensusNodeService {
                         .address(currentRoundNode.getAddress())
                         .rankChange(rankChange)
                         .publicKey(currentRoundNode.getPublicKey())
-                        .changeBlockHeight(currentRoundNode.getBlockHeight())
+                        .changeBlockHeight(currentBlockHeight)
                         .build();
                 nodeRankChangeMapper.insert(nodeRankChange);
             }
