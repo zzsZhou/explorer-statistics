@@ -107,7 +107,7 @@ public class ConsensusNodeService {
                 NodeRankHistory lastRoundNodeRank = nodeRankHistoryMapper.selectNodeRankHistoryByPublicKeyAndBlockHeight(currentRoundNode.getPublicKey(), lastRoundBlockHeight);
                 int rankChange = 0;
                 if (lastRoundNodeRank != null) {
-                    rankChange = currentRoundNode.getNodeRank() - lastRoundNodeRank.getNodeRank();
+                    rankChange = lastRoundNodeRank.getNodeRank() - currentRoundNode.getNodeRank();
                 }
                 NodeRankChange nodeRankChange = NodeRankChange.builder()
                         .name(currentRoundNode.getName())
