@@ -49,7 +49,7 @@ config:
   consensus-node-detail-url: https://explorer.ont.io/nodes/detail/
   node-map-url: http://52.77.140.175:8888/api/nodes
   is-test-net: false
-  new-staking-round-block-count: 120000
+  max-staking-change-count: 120000
 
 node-schedule-task:
   update-on-chain-info: 300000

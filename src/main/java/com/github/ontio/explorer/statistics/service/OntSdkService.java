@@ -1,6 +1,7 @@
 package com.github.ontio.explorer.statistics.service;
 
 import com.github.ontio.OntSdk;
+import com.github.ontio.core.governance.Configuration;
 import com.github.ontio.core.governance.GovernanceView;
 import com.github.ontio.explorer.statistics.common.ParamsConfig;
 import com.github.ontio.network.exception.ConnectorException;
@@ -12,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.nio.file.LinkOption;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
@@ -51,6 +50,24 @@ public class OntSdkService {
             switchSyncNode();
             log.info("Getting governance view again");
             return getGovernanceView();
+        }
+    }
+
+    int getStakingChangeCount() {
+        try {
+            Configuration configuration = sdk.nativevm().governance().getConfiguration();
+            if (configuration == null) {
+                log.warn("Getting native vm configuration failed: configuration is null");
+                switchSyncNode();
+                log.info("Try to get native vm configuration again");
+                return getStakingChangeCount();
+            }
+            return configuration.MaxBlockChangeView;
+        } catch (ConnectorException | IOException | SDKException e) {
+            log.warn("Getting native vm configuration failed: {}", e.getMessage());
+            switchSyncNode();
+            log.info("Getting native vm configuration again");
+            return getStakingChangeCount();
         }
     }
 

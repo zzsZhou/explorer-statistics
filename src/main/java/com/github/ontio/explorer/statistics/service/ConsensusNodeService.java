@@ -133,7 +133,7 @@ public class ConsensusNodeService {
         }
         try {
             long blockHeight = ontSdkService.getBlockHeight();
-            long nextRoundBlockHeight = currentRoundBlockHeight + paramsConfig.getNewStakingRoundBlockCount();
+            long nextRoundBlockHeight = currentRoundBlockHeight + paramsConfig.getMaxStakingChangeCount();
             if (nextRoundBlockHeight > blockHeight) {
                 log.info("Current block height is {}, next round block height should be {} ", blockHeight, nextRoundBlockHeight);
                 return;
@@ -150,7 +150,7 @@ public class ConsensusNodeService {
             log.warn("Getting governance view in consensus node service failed:");
             return;
         }
-        long currentRoundBlockHeight = view.height - paramsConfig.getNewStakingRoundBlockCount();
+        long currentRoundBlockHeight = view.height - paramsConfig.getMaxStakingChangeCount();
         updateNodeRankHistoryFromNodeInfoOnChain(currentRoundBlockHeight);
     }
 
@@ -176,7 +176,7 @@ public class ConsensusNodeService {
             return -1;
         }
         long blockHeight = ontSdkService.getBlockHeight();
-        return 120000 - (blockHeight - view.height);
+        return paramsConfig.getMaxStakingChangeCount() - (blockHeight - view.height);
     }
 
     public void updateConsensusNodeInfo() {
