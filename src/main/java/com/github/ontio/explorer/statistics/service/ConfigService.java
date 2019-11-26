@@ -28,14 +28,14 @@ public class ConfigService {
 
 
     public String getMaxStakingChangeCount() {
-        Config config = configMapper.selectByPrimaryKey(ParamsConfig.Field.stakingRoundBlockCount);
+        Config config = configMapper.selectByPrimaryKey(ParamsConfig.Field.maxStakingChangeCount);
         return config == null ? "" : config.getValue();
     }
 
     public String updateMaxStakingChangeCount() {
         int maxStakingChangeCount = ontSdkService.getStakingChangeCount();
-        Config config = new Config(ParamsConfig.Field.stakingRoundBlockCount, String.valueOf(maxStakingChangeCount));
-        Config selectConfig = configMapper.selectByPrimaryKey(ParamsConfig.Field.stakingRoundBlockCount);
+        Config config = new Config(ParamsConfig.Field.maxStakingChangeCount, String.valueOf(maxStakingChangeCount));
+        Config selectConfig = configMapper.selectByPrimaryKey(ParamsConfig.Field.maxStakingChangeCount);
         int result;
         if (selectConfig == null) {
             result = configMapper.insert(config);

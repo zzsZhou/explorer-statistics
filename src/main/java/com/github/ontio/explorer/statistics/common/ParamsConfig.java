@@ -29,11 +29,9 @@ public class ParamsConfig {
 
     private int maxStakingChangeCount;
 
-    private Long stakingRoundBlockCount;
-
     public interface Field {
 
-        String stakingRoundBlockCount = "stakingRoundBlockCount";
+        String maxStakingChangeCount = "maxStakingChangeCount";
 
     }
 
