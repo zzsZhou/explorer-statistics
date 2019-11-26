@@ -19,8 +19,8 @@ public class ConfigController {
 
     @ApiOperation(value = "Get max staking change count from DB")
     @GetMapping(value = "/max-staking-change-count")
-    public Response getmaxStakingChangeCount() {
-        String count = configService.getmaxStakingChangeCount();
+    public Response getMaxStakingChangeCount() {
+        String count = configService.getMaxStakingChangeCount();
         if (count == null || count.length() == 0) {
             return new Response(Result.INTERNAL_SERVER_ERROR);
         }

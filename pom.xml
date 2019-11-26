@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.github.ontio.explorer</groupId>
     <artifactId>statistics</artifactId>
-    <version>1.3.0.RC1</version>
+    <version>1.3.0.RC2</version>
     <name>explorer-statistics</name>
     <description>Statistics project for ontology explorer</description>
 
