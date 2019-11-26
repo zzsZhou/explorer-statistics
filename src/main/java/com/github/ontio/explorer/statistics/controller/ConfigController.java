@@ -17,10 +17,10 @@ public class ConfigController {
         this.configService = configService;
     }
 
-    @ApiOperation(value = "Get block count of the staking cycle")
-    @GetMapping(value = "/staking-round-block-count")
-    public Response getBlockCountInStakingRound() {
-        String count = configService.getBlockCountInStakingCycle();
+    @ApiOperation(value = "Get max staking change count from DB")
+    @GetMapping(value = "/max-staking-change-count")
+    public Response getmaxStakingChangeCount() {
+        String count = configService.getmaxStakingChangeCount();
         if (count == null || count.length() == 0) {
             return new Response(Result.INTERNAL_SERVER_ERROR);
         }

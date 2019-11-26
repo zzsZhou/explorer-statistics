@@ -27,7 +27,7 @@ public class ConfigService {
     }
 
 
-    public String getBlockCountInStakingCycle() {
+    public String getmaxStakingChangeCount() {
         Config config = configMapper.selectByPrimaryKey(ParamsConfig.Field.stakingRoundBlockCount);
         return config == null ? "" : config.getValue();
     }
