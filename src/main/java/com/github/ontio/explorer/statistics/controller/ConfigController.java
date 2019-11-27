@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("v2/config")
+@RequestMapping("v2/nodes/")
 public class ConfigController {
 
     private ConfigService configService;
