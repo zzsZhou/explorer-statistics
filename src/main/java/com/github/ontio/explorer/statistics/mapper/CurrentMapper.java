@@ -21,4 +21,9 @@ import tk.mybatis.mapper.common.Mapper;
 
 @Repository
 public interface CurrentMapper extends Mapper<Current> {
+
+	int findLastStatTxTime();
+
+	int saveLastStatTxTime(int lastStatTxTime);
+
 }

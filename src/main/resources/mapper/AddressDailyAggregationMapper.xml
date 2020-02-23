@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.ontio.explorer.statistics.mapper.AddressDailyAggregationMapper">
+    <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.AddressDailyAggregation">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="address" jdbcType="CHAR" property="address"/>
+        <result column="token_contract_hash" jdbcType="CHAR" property="tokenContractHash"/>
+        <result column="date_id" jdbcType="INTEGER" property="dateId"/>
+        <result column="balance" jdbcType="DECIMAL" property="balance"/>
+        <result column="usd_price" jdbcType="DECIMAL" property="usdPrice"/>
+        <result column="max_balance" jdbcType="DECIMAL" property="maxBalance"/>
+        <result column="min_balance" jdbcType="DECIMAL" property="minBalance"/>
+        <result column="deposit_tx_count" jdbcType="INTEGER" property="depositTxCount"/>
+        <result column="withdraw_tx_count" jdbcType="INTEGER" property="withdrawTxCount"/>
+        <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount"/>
+        <result column="withdraw_amount" jdbcType="DECIMAL" property="withdrawAmount"/>
+        <result column="deposit_address_count" jdbcType="INTEGER" property="depositAddressCount"/>
+        <result column="withdraw_address_count" jdbcType="INTEGER" property="withdrawAddressCount"/>
+        <result column="tx_address_count" jdbcType="INTEGER" property="txAddressCount"/>
+        <result column="fee_amount" jdbcType="DECIMAL" property="feeAmount"/>
+        <result column="contract_count" jdbcType="INTEGER" property="contractCount"/>
+        <result column="is_virtual" jdbcType="BIT" property="isVirtual"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <insert id="batchSave">
+        INSERT INTO tbl_address_daily_aggregation
+        (
+        address,
+        token_contract_hash,
+        date_id,
+        balance,
+        usd_price,
+        max_balance,
+        min_balance,
+        deposit_tx_count,
+        withdraw_tx_count,
+        deposit_amount,
+        withdraw_amount,
+        deposit_address_count,
+        withdraw_address_count,
+        tx_address_count,
+        fee_amount,
+        contract_count,
+        is_virtual
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.address},
+            #{item.tokenContractHash},
+            #{item.dateId},
+            #{item.balance},
+            #{item.usdPrice},
+            #{item.maxBalance},
+            #{item.minBalance},
+            #{item.depositTxCount},
+            #{item.withdrawTxCount},
+            #{item.depositAmount},
+            #{item.withdrawAmount},
+            #{item.depositAddressCount},
+            #{item.withdrawAddressCount},
+            #{item.txAddressCount},
+            #{item.feeAmount},
+            #{item.contractCount},
+            #{item.isVirtual}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        balance = values(balance),
+        usd_price = values(usd_price),
+        max_balance = values(max_balance),
+        min_balance = values(min_balance),
+        deposit_tx_count = values(deposit_tx_count),
+        withdraw_tx_count = values(withdraw_tx_count),
+        deposit_amount = values(deposit_amount),
+        withdraw_amount = values(withdraw_amount),
+        deposit_address_count = values(deposit_address_count),
+        withdraw_address_count = values(withdraw_address_count),
+        tx_address_count = values(tx_address_count),
+        fee_amount = values(fee_amount),
+        contract_count = values(contract_count),
+        is_virtual = values(is_virtual)
+    </insert>
+</mapper>

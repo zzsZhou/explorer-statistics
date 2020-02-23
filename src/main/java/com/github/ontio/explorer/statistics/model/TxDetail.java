@@ -15,22 +15,28 @@
 
 package com.github.ontio.explorer.statistics.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
-import javax.persistence.*;
 
 @Table(name = "tbl_tx_detail")
 public class TxDetail {
     /**
-     * 交易hash
+     * ID
      */
     @Id
+    private Integer id;
+    
+    /**
+     * 交易hash
+     */
     @Column(name = "tx_hash")
     private String txHash;
 
     /**
      * 该event在交易eventlog里的索引
      */
-    @Id
     @Column(name = "tx_index")
     private Integer txIndex;
 
@@ -119,6 +125,14 @@ public class TxDetail {
      */
     @Column(name = "called_contract_hash")
     private String calledContractHash;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     /**
      * 获取交易hash

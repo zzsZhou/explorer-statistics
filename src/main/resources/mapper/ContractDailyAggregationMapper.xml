@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.ontio.explorer.statistics.mapper.ContractDailyAggregationMapper">
+    <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.ContractDailyAggregation">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="contract_hash" jdbcType="CHAR" property="contractHash"/>
+        <result column="token_contract_hash" jdbcType="CHAR" property="tokenContractHash"/>
+        <result column="date_id" jdbcType="INTEGER" property="dateId"/>
+        <result column="tx_count" jdbcType="INTEGER" property="txCount"/>
+        <result column="tx_amount" jdbcType="DECIMAL" property="txAmount"/>
+        <result column="deposit_address_count" jdbcType="INTEGER" property="depositAddressCount"/>
+        <result column="withdraw_address_count" jdbcType="INTEGER" property="withdrawAddressCount"/>
+        <result column="tx_address_count" jdbcType="INTEGER" property="txAddressCount"/>
+        <result column="fee_amount" jdbcType="DECIMAL" property="feeAmount"/>
+        <result column="contract_count" jdbcType="INTEGER" property="contractCount"/>
+        <result column="is_virtual" jdbcType="BIT" property="isVirtual"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <insert id="batchSave">
+        INSERT INTO tbl_contract_daily_aggregation
+        (
+        contract_hash,
+        token_contract_hash,
+        date_id,
+        tx_count,
+        tx_amount,
+        deposit_address_count,
+        withdraw_address_count,
+        tx_address_count,
+        fee_amount,
+        contract_count,
+        is_virtual
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.contractHash},
+            #{item.tokenContractHash},
+            #{item.dateId},
+            #{item.txCount},
+            #{item.txAmount},
+            #{item.depositAddressCount},
+            #{item.withdrawAddressCount},
+            #{item.txAddressCount},
+            #{item.feeAmount},
+            #{item.contractCount},
+            #{item.isVirtual}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        contract_hash=values(contract_hash),
+        token_contract_hash=values(token_contract_hash),
+        date_id=values(date_id),
+        tx_count=values(tx_count),
+        tx_amount=values(tx_amount),
+        deposit_address_count=values(deposit_address_count),
+        withdraw_address_count=values(withdraw_address_count),
+        tx_address_count=values(tx_address_count),
+        fee_amount=values(fee_amount),
+        contract_count = values(contract_count),
+        is_virtual=values(is_virtual)
+    </insert>
+</mapper>

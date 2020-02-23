@@ -22,4 +22,5 @@ import tk.mybatis.mapper.common.Mapper;
 @Repository
 public interface TxDetailMapper extends Mapper<TxDetail> {
     // self-defined SQL
+    Integer findLastIdBeforeTxTime(int txTime);
 }
