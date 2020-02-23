@@ -78,6 +78,7 @@ public class ContractAggregate extends AbstractAggregate<ContractAggregate.Contr
 		if (context.isVirtualAll(key().getTokenContractHash())) {
 			txCount++;
 			feeAmount = feeAmount.add(transactionInfo.getFee());
+			this.contractCounter.count(transactionInfo.getContractHash());
 			changed = true;
 		}
 	}
