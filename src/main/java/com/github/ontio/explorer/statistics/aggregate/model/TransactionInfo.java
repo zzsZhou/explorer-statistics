@@ -2,6 +2,7 @@ package com.github.ontio.explorer.statistics.aggregate.model;
 
 import com.github.ontio.explorer.statistics.aggregate.support.DateIdUtil;
 import com.github.ontio.explorer.statistics.model.TxDetail;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -15,13 +16,21 @@ import java.math.BigDecimal;
 @Builder
 @Getter
 @ToString
+@AllArgsConstructor
 public class TransactionInfo implements Serializable {
+
+	public static final TransactionInfo ONE_DAY_RANK_BEGIN = new TransactionInfo();
+	public static final TransactionInfo ONE_DAY_RANK_END = new TransactionInfo();
+
+	public static final TransactionInfo RANK_BEGIN = new TransactionInfo();
+	public static final TransactionInfo RANK_END = new TransactionInfo();
 
 	private static final int EVENT_TYPE_TRANSFER = 3;
 
 	private static final int EVENT_TYPE_GAS = 2;
 
-//	private static final BigDecimal ONG_VALUE_FACTOR = BigDecimal.valueOf(1000000000L);
+	private TransactionInfo() {
+	}
 
 	private String txHash;
 

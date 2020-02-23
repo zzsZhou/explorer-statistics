@@ -3,6 +3,8 @@ package com.github.ontio.explorer.statistics.aggregate.support;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import java.time.Duration;
+
 import static org.joda.time.DateTimeZone.UTC;
 
 /**
@@ -11,6 +13,8 @@ import static org.joda.time.DateTimeZone.UTC;
 public class DateIdUtil {
 
 	public static final DateTime BASE = new DateTime(2015, 1, 1, 0, 0, UTC);
+
+	public static final Duration ONE_DAY = Duration.ofHours(24);
 
 	public static int parseDateId(int txTime) {
 		DateTime date = new DateTime(txTime * 1000L, UTC);
@@ -22,10 +26,6 @@ public class DateIdUtil {
 
 	public static String toDateString(int dateId) {
 		return BASE.plusDays(dateId - 1).toString("yyyyMMdd");
-	}
-
-	public static void main(String[] args) {
-		System.out.println(toDateString(parseDateId(1530316800)));
 	}
 
 }

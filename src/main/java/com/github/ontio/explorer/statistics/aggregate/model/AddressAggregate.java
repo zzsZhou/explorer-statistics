@@ -96,6 +96,9 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 
 	@Override
 	protected void aggregateGas(TransactionInfo transactionInfo) {
+		if (context.virtualContracts().contains(key().getTokenContractHash())) {
+			contractCounter.count(transactionInfo.getContractHash());
+		}
 		if (transactionInfo.getFromAddress().equals(key().getAddress())) {
 			withdrawTxCount++;
 			total.withdrawTxCount++;
