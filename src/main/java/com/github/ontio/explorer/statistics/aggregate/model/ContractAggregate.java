@@ -72,9 +72,11 @@ public class ContractAggregate extends AbstractAggregate<ContractAggregate.Contr
 
 	@Override
 	protected void aggregateGas(TransactionInfo transactionInfo) {
+		total.txCount++;
 		total.feeAmount = total.feeAmount.add(transactionInfo.getFee());
 		total.changed = true;
 		if (context.isVirtualAll(key().getTokenContractHash())) {
+			txCount++;
 			feeAmount = feeAmount.add(transactionInfo.getFee());
 			changed = true;
 		}

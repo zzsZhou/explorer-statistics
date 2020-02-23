@@ -23,9 +23,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-//@Component
+@Component
 @EnableScheduling
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "node-schedule-task")

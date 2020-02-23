@@ -51,8 +51,7 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 
 	@Override
 	protected void aggregateTransfer(TransactionInfo transactionInfo) {
-		String tokenContractHash = key().getTokenContractHash();
-		if (context.virtualContracts().contains(tokenContractHash)) {
+		if (context.virtualContracts().contains(key().getTokenContractHash())) {
 			if (transactionInfo.getFromAddress().equals(key().getAddress())) {
 				withdrawTxCount++;
 				withdrawAddressCounter.count(transactionInfo.getToAddress());
@@ -98,13 +97,18 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 	@Override
 	protected void aggregateGas(TransactionInfo transactionInfo) {
 		if (transactionInfo.getFromAddress().equals(key().getAddress())) {
-			total.feeAmount = total.feeAmount.add(transactionInfo.getFee());
-			total.changed = true;
-			if (context.isVirtualAll(key().getTokenContractHash())) {
+			withdrawTxCount++;
+			total.withdrawTxCount++;
+			if (context.virtualContracts().contains(key().getTokenContractHash())) {
 				feeAmount = feeAmount.add(transactionInfo.getFee());
-				changed = true;
+				total.feeAmount = total.feeAmount.add(transactionInfo.getFee());
 			}
+		} else if (transactionInfo.getToAddress().equals(key().getAddress())) {
+			depositTxCount++;
+			total.depositTxCount++;
 		}
+		changed = true;
+		total.changed = true;
 	}
 
 	@Override

@@ -60,7 +60,9 @@ public class TokenAggregate extends AbstractAggregate<TokenAggregate.TokenAggreg
 	@Override
 	protected void aggregateGas(TransactionInfo transactionInfo) {
 		BigDecimal fee = transactionInfo.getFee();
+		this.txCount++;
 		this.feeAmount = this.feeAmount.add(fee);
+		this.total.txCount++;
 		this.total.feeAmount = this.total.feeAmount.add(fee);
 
 		this.changed = true;
@@ -99,7 +101,7 @@ public class TokenAggregate extends AbstractAggregate<TokenAggregate.TokenAggreg
 		if (!changed) {
 			return Optional.empty();
 		}
-		
+
 		TokenDailyAggregation snapshot = new TokenDailyAggregation();
 		snapshot.setTokenContractHash(key().getTokenContractHash());
 		snapshot.setDateId(context.getDateId());
@@ -118,7 +120,7 @@ public class TokenAggregate extends AbstractAggregate<TokenAggregate.TokenAggreg
 		if (!total.changed) {
 			return Optional.empty();
 		}
-		
+
 		TokenDailyAggregation snapshot = new TokenDailyAggregation();
 		snapshot.setTokenContractHash(key().getTokenContractHash());
 		snapshot.setDateId(0);

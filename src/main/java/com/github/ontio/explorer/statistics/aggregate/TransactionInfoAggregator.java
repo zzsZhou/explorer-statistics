@@ -136,9 +136,9 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 		List<String> addresses = new ArrayList<>();
 		if (transactionInfo.isTransfer()) {
 			addresses.add(transactionInfo.getFromAddress());
-			addresses.add(transactionInfo.getToAddress());
-		} else if (transactionInfo.isGas()) {
-			addresses.add(transactionInfo.getFromAddress());
+			if (!transactionInfo.isSelfTransaction()) {
+				addresses.add(transactionInfo.getToAddress());
+			}
 		}
 		List<String> tokenContractHashes = selectTokenContractHashes(transactionInfo.getContractHash());
 
