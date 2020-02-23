@@ -21,12 +21,6 @@ public class TransactionInfo implements Serializable {
 
 	private static final int EVENT_TYPE_GAS = 2;
 
-//	private static final BigDecimal ONG_VALUE_FACTOR = BigDecimal.valueOf(1000000000L);
-
-	private String txHash;
-
-	private Integer txType;
-
 	private int txTime;
 
 	private BigDecimal amount;
@@ -61,8 +55,6 @@ public class TransactionInfo implements Serializable {
 
 	public static TransactionInfo wrap(TxDetail txDetail) {
 		TransactionInfoBuilder builder = new TransactionInfoBuilder()
-				.txHash(txDetail.getTxHash())
-				.txType(txDetail.getTxType())
 				.txTime(txDetail.getTxTime())
 				.amount(txDetail.getAmount())
 				.fee(txDetail.getFee())
