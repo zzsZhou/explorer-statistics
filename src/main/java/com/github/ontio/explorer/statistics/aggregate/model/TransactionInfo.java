@@ -21,6 +21,8 @@ public class TransactionInfo implements Serializable {
 
 	private static final int EVENT_TYPE_GAS = 2;
 
+	private static final BigDecimal ONG_MULTIPLE = new BigDecimal("0.000000001");
+
 	private int txTime;
 
 	private BigDecimal amount;
@@ -40,6 +42,10 @@ public class TransactionInfo implements Serializable {
 	private String calledContractHash;
 
 	private int dateId;
+
+	public BigDecimal getAmount() {
+		return "ong".equalsIgnoreCase(assetName) ? amount.multiply(ONG_MULTIPLE) : amount;
+	}
 
 	public boolean isTransfer() {
 		return EVENT_TYPE_TRANSFER == eventType;
