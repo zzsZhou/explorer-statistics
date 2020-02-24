@@ -132,7 +132,7 @@ public class AggregateService {
 			}
 		}
 
-		currentMapper.saveLastStatTxTime(snapshot.getLastTxTime());
+		currentMapper.saveLastStatBlockHeight(snapshot.getLastBlockHeight());
 	}
 
 }

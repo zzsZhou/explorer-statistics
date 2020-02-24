@@ -1,23 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.ontio.explorer.statistics.mapper.TxDetailMapper">
-  <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.TxDetail">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <result column="address" jdbcType="VARCHAR" property="address" />
-    <result column="block_height" jdbcType="INTEGER" property="blockHeight" />
-    <result column="event_type" jdbcType="INTEGER" property="eventType" />
-    <result column="tx_time" jdbcType="TIMESTAMP" property="txTime" />
-    <result column="asset_name" jdbcType="VARCHAR" property="assetName" />
-    <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
-  </resultMap>
+    <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.TxDetail">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="block_height" jdbcType="INTEGER" property="blockHeight"/>
+        <result column="event_type" jdbcType="INTEGER" property="eventType"/>
+        <result column="tx_time" jdbcType="TIMESTAMP" property="txTime"/>
+        <result column="asset_name" jdbcType="VARCHAR" property="assetName"/>
+        <result column="tx_hash" jdbcType="VARCHAR" property="txHash"/>
+    </resultMap>
 
     <select id="findLastIdBeforeTxTime" resultType="java.lang.Integer">
         SELECT id
         FROM tbl_tx_detail
-        WHERE tx_time &lt;= #{txTime}
+        WHERE tx_time &lt; #{txTime}
         ORDER BY id DESC
+        LIMIT 1
+    </select>
+
+    <select id="findFirstIdAfterTxTime" resultType="java.lang.Integer">
+        SELECT id
+        FROM tbl_tx_detail
+        WHERE tx_time &gt;= #{txTime}
+        ORDER BY id
+        LIMIT 1
+    </select>
+
+    <select id="findLastIdBeforeBlockHeight" resultType="java.lang.Integer">
+        SELECT id
+        FROM tbl_tx_detail
+        WHERE block_height &lt; #{blockHeight}
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
+    <select id="findLatestBlockHeight" resultType="java.lang.Integer">
+        SELECT block_height
+        FROM tbl_tx_detail
+        ORDER BY block_height DESC
         LIMIT 1
     </select>
 

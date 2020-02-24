@@ -54,10 +54,11 @@ public class AggregateContext {
 
 	@Getter
 	@Setter
-	private int txTime;
+	private int blockHeight;
 
 	private final ContractMapper contractMapper;
 
+	@Getter
 	private final ParamsConfig config;
 
 	private LoadingCache<String, ContractType> contractTypes;

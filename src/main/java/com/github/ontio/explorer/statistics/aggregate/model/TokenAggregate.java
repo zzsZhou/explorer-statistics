@@ -44,13 +44,16 @@ public class TokenAggregate extends AbstractAggregate<TokenAggregate.TokenAggreg
 		String from = transactionInfo.getFromAddress();
 		String to = transactionInfo.getToAddress();
 
-		this.txCount++;
+		if (isTxHashChanged(transactionInfo)) {
+			this.txCount++;
+			this.total.txCount++;
+		}
+
 		this.txAmount = this.txAmount.add(amount);
 		this.depositAddressCounter.count(to);
 		this.withdrawAddressCounter.count(from);
 		this.txAddressCounter.count(from, to);
 
-		this.total.txCount++;
 		this.total.txAmount = this.total.txAmount.add(amount);
 
 		this.changed = true;
@@ -60,9 +63,15 @@ public class TokenAggregate extends AbstractAggregate<TokenAggregate.TokenAggreg
 	@Override
 	protected void aggregateGas(TransactionInfo transactionInfo) {
 		BigDecimal fee = transactionInfo.getFee();
-		this.txCount++;
+		BigDecimal amount = transactionInfo.getAmount();
+		if (isTxHashChanged(transactionInfo)) {
+			this.txCount++;
+			this.total.txCount++;
+		}
+
+		this.txAmount = this.txAmount.add(amount);
 		this.feeAmount = this.feeAmount.add(fee);
-		this.total.txCount++;
+		this.total.txAmount = this.total.txAmount.add(amount);
 		this.total.feeAmount = this.total.feeAmount.add(fee);
 
 		this.changed = true;

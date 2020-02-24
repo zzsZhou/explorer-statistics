@@ -43,44 +43,54 @@ public class ContractAggregate extends AbstractAggregate<ContractAggregate.Contr
 	@Override
 	protected void aggregateTransfer(TransactionInfo transactionInfo) {
 		String tokenContractHash = key().getTokenContractHash();
+		BigDecimal amount = transactionInfo.getAmount();
+		String from = transactionInfo.getFromAddress();
+		String to = transactionInfo.getToAddress();
+
+		contractCounter.count(transactionInfo.getContractHash());
 		if (context.virtualContracts().contains(tokenContractHash)) {
-			String from = transactionInfo.getFromAddress();
-			String to = transactionInfo.getToAddress();
+			if (isTxHashChanged(transactionInfo)) {
+				txCount++;
+				total.txCount++;
+			}
 
-			this.txCount++;
-			this.depositAddressCounter.count(to);
-			this.withdrawAddressCounter.count(from);
-			this.txAddressCounter.count(from, to);
-			this.contractCounter.count(transactionInfo.getContractHash());
-
-			this.total.txCount++;
+			depositAddressCounter.count(to);
+			withdrawAddressCounter.count(from);
+			txAddressCounter.count(from, to);
 		} else {
-			BigDecimal amount = transactionInfo.getAmount();
-			String from = transactionInfo.getFromAddress();
-			String to = transactionInfo.getToAddress();
+			if (isTxHashChanged(transactionInfo)) {
+				txCount++;
+				total.txCount++;
+			}
 
-			this.txCount++;
-			this.txAmount = this.txAmount.add(amount);
-			this.txAddressCounter.count(from, to);
-
-			this.total.txCount++;
-			this.total.txAmount = this.total.txAmount.add(amount);
+			txAmount = txAmount.add(amount);
+			txAddressCounter.count(from, to);
+			total.txAmount = total.txAmount.add(amount);
 		}
-		this.changed = true;
-		this.total.changed = true;
+		changed = true;
+		total.changed = true;
 	}
 
 	@Override
 	protected void aggregateGas(TransactionInfo transactionInfo) {
-		total.txCount++;
-		total.feeAmount = total.feeAmount.add(transactionInfo.getFee());
-		total.changed = true;
-		if (context.isVirtualAll(key().getTokenContractHash())) {
+		BigDecimal amount = transactionInfo.getAmount();
+		BigDecimal fee = transactionInfo.getFee();
+
+		contractCounter.count(transactionInfo.getContractHash());
+		if (isTxHashChanged(transactionInfo)) {
 			txCount++;
-			feeAmount = feeAmount.add(transactionInfo.getFee());
-			this.contractCounter.count(transactionInfo.getContractHash());
-			changed = true;
+			total.txCount++;
 		}
+		if (context.virtualContracts().contains(key().getTokenContractHash())) {
+			feeAmount = feeAmount.add(fee);
+			total.feeAmount = total.feeAmount.add(fee);
+		} else {
+			txAmount = txAmount.add(amount);
+			total.txAmount = total.txAmount.add(amount);
+		}
+
+		changed = true;
+		total.changed = true;
 	}
 
 	@Override

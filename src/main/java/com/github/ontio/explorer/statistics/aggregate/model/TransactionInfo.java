@@ -23,7 +23,11 @@ public class TransactionInfo implements Serializable {
 
 	private static final BigDecimal ONG_MULTIPLE = new BigDecimal("0.000000001");
 
+	private String txHash;
+
 	private int txTime;
+
+	private int blockHeight;
 
 	private BigDecimal amount;
 
@@ -61,7 +65,9 @@ public class TransactionInfo implements Serializable {
 
 	public static TransactionInfo wrap(TxDetail txDetail) {
 		TransactionInfoBuilder builder = new TransactionInfoBuilder()
+				.txHash(txDetail.getTxHash())
 				.txTime(txDetail.getTxTime())
+				.blockHeight(txDetail.getBlockHeight())
 				.amount(txDetail.getAmount())
 				.fee(txDetail.getFee())
 				.assetName(txDetail.getAssetName())

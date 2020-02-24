@@ -13,13 +13,13 @@
   <!--
     self-defined SQL
   -->
-  <select id="findLastStatTxTime" resultType="java.lang.Integer">
-    SELECT last_stat_tx_time
+  <select id="findLastStatBlockHeight" resultType="java.lang.Integer">
+    SELECT last_stat_block_height
     FROM tbl_current;
   </select>
 
-  <update id="saveLastStatTxTime">
+  <update id="saveLastStatBlockHeight">
     UPDATE tbl_current
-    SET last_stat_tx_time = #{lastStatTxTime}
+    SET last_stat_block_height = #{blockHeight}
   </update>
 </mapper>

@@ -21,7 +21,7 @@ public class AggregateSnapshot implements Serializable {
 
 	private final int currentDateId;
 
-	private final int lastTxTime;
+	private final int lastBlockHeight;
 
 	private Set<AggregateKey> aggregateKeys = new HashSet<>();
 

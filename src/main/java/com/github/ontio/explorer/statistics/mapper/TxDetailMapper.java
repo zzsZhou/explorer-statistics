@@ -23,4 +23,11 @@ import tk.mybatis.mapper.common.Mapper;
 public interface TxDetailMapper extends Mapper<TxDetail> {
     // self-defined SQL
     Integer findLastIdBeforeTxTime(int txTime);
+
+    Integer findFirstIdAfterTxTime(int txTime);
+
+    Integer findLastIdBeforeBlockHeight(int blockHeight);
+
+    Integer findLatestBlockHeight();
+
 }

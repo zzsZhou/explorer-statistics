@@ -98,7 +98,7 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 			aggregate.aggregate(transactionInfo);
 		});
 
-		context.setTxTime(transactionInfo.getTxTime());
+		context.setBlockHeight(transactionInfo.getBlockHeight());
 
 		if (++this.aggregated % 1000 == 0) {
 			log.info("{} transactions have been aggregated", this.aggregated);
@@ -110,7 +110,7 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 			log.info("sinking aggregations of date {}", DateIdUtil.toDateString(context.getDateId()));
 		}
 		currentAggregates.forEach((key, aggregate) -> stagingAggregates.put(key, aggregate));
-		AggregateSnapshot snapshot = new AggregateSnapshot(context.getDateId(), context.getTxTime());
+		AggregateSnapshot snapshot = new AggregateSnapshot(context.getDateId(), context.getBlockHeight());
 		snapshot.append(currentAggregates.values());
 		currentAggregates = new HashMap<>();
 		aggregationSinker.sink(snapshot);

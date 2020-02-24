@@ -30,6 +30,8 @@ public class ParamsConfig {
 
     private String ongContractHash = "0200000000000000000000000000000000000000";
 
+    private double aggregationRateLimit = 100;
+
     public interface Field {
 
         String maxStakingChangeCount = "maxStakingChangeCount";

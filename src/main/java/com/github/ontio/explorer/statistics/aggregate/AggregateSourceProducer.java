@@ -2,6 +2,7 @@ package com.github.ontio.explorer.statistics.aggregate;
 
 import com.github.ontio.explorer.statistics.aggregate.model.TransactionInfo;
 import com.github.ontio.explorer.statistics.aggregate.support.DisruptorEventDispatcher;
+import com.github.ontio.explorer.statistics.common.ParamsConfig;
 import com.github.ontio.explorer.statistics.mapper.CurrentMapper;
 import com.github.ontio.explorer.statistics.mapper.TxDetailMapper;
 import com.github.ontio.explorer.statistics.model.TxDetail;
@@ -25,17 +26,22 @@ public class AggregateSourceProducer {
 
 	private static final int BATCH_SIZE = 5000;
 
+	private static final int BLOCK_BATCH_SIZE = 1000;
+
 	private final DisruptorEventDispatcher dispatcher;
 
 	private final TxDetailMapper txDetailMapper;
 
 	private final CurrentMapper currentMapper;
 
+	private final ParamsConfig config;
+
 	private RateLimiter rateLimiter;
 
 	private volatile int startTxDetailId;
 
-	@Scheduled(initialDelay = 5000, fixedRate = 5000)
+	private volatile int startBlockHeight;
+
 	public void produceTransactionInfo() {
 		int id = startTxDetailId;
 
@@ -50,7 +56,9 @@ public class AggregateSourceProducer {
 			}
 
 			for (TxDetail detail : details) {
-				rateLimiter.acquire();
+				if (rateLimiter != null) {
+					rateLimiter.acquire();
+				}
 				TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
 				dispatcher.dispatch(transactionInfo);
 				id = detail.getId();
@@ -60,14 +68,51 @@ public class AggregateSourceProducer {
 		this.startTxDetailId = id;
 	}
 
+	@Scheduled(initialDelay = 5000, fixedRate = 5000)
+	public void productTransactionInfoByBlockHeight() {
+		Integer latestBlockHeight = txDetailMapper.findLatestBlockHeight();
+		if (latestBlockHeight == null) {
+			return;
+		}
+		int blockHeight = this.startBlockHeight;
+
+		while (blockHeight < latestBlockHeight) {
+			Example example = new Example(TxDetail.class);
+			example.and()
+					.andGreaterThan("blockHeight", blockHeight)
+					.andLessThanOrEqualTo("blockHeight", blockHeight + BLOCK_BATCH_SIZE)
+					.andIn("eventType", Arrays.asList(2, 3));
+			example.orderBy("blockHeight").orderBy("blockIndex").orderBy("txIndex");
+			List<TxDetail> details = txDetailMapper.selectByExample(example);
+
+			if (details == null || details.isEmpty()) {
+				blockHeight += BLOCK_BATCH_SIZE;
+				continue;
+			}
+
+			for (TxDetail detail : details) {
+				if (rateLimiter != null) {
+					rateLimiter.acquire();
+				}
+				TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
+				dispatcher.dispatch(transactionInfo);
+				blockHeight = detail.getBlockHeight();
+			}
+		}
+
+		this.startBlockHeight = blockHeight;
+	}
+
 	@PostConstruct
-	public void initializeStartId() {
-		int txTime = currentMapper.findLastStatTxTime();
-		Integer id = txDetailMapper.findLastIdBeforeTxTime(txTime);
+	public void initialize() {
+		startBlockHeight = currentMapper.findLastStatBlockHeight();
+		Integer id = txDetailMapper.findLastIdBeforeBlockHeight(startBlockHeight + 1);
 		if (id != null) {
 			this.startTxDetailId = id;
 		}
-		this.rateLimiter = RateLimiter.create(100.0);
+		if (config.getAggregationRateLimit() > 0) {
+			this.rateLimiter = RateLimiter.create(config.getAggregationRateLimit());
+		}
 	}
 
 }

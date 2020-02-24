@@ -13,6 +13,8 @@ public abstract class AbstractAggregate<K extends AggregateKey, T> implements Ag
 
 	private final K key;
 
+	private transient String lastTxHash;
+
 	protected AbstractAggregate(AggregateContext context, K key) {
 		this.context = context;
 		this.key = key;
@@ -30,6 +32,7 @@ public abstract class AbstractAggregate<K extends AggregateKey, T> implements Ag
 		} else if (transactionInfo.isGas()) {
 			aggregateGas(transactionInfo);
 		}
+		this.lastTxHash = transactionInfo.getTxHash();
 	}
 
 	protected abstract void aggregateTransfer(TransactionInfo transactionInfo);
@@ -49,14 +52,18 @@ public abstract class AbstractAggregate<K extends AggregateKey, T> implements Ag
 	public Optional<T> snapshot(boolean total) {
 		return total ? snapshotTotal() : snapshot();
 	}
-	
+
 	protected abstract Optional<T> snapshot();
-	
+
 	protected abstract Optional<T> snapshotTotal();
 
 	@Override
 	public void rebase() {
 		populateBaseline(null);
+	}
+
+	protected boolean isTxHashChanged(TransactionInfo transactionInfo) {
+		return !transactionInfo.getTxHash().equals(lastTxHash);
 	}
 
 }

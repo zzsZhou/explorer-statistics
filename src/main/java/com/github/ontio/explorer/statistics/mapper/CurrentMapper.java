@@ -22,8 +22,8 @@ import tk.mybatis.mapper.common.Mapper;
 @Repository
 public interface CurrentMapper extends Mapper<Current> {
 
-	int findLastStatTxTime();
+	int findLastStatBlockHeight();
 
-	int saveLastStatTxTime(int lastStatTxTime);
+	int saveLastStatBlockHeight(int blockHeight);
 
 }
