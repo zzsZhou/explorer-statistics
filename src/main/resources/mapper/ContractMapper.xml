@@ -77,7 +77,7 @@
                  LEFT OUTER JOIN tbl_oep4 oep4 ON oep4.contract_hash = c.contract_hash
                  LEFT OUTER JOIN tbl_oep5 oep5 ON oep5.contract_hash = c.contract_hash
                  LEFT OUTER JOIN tbl_oep8 oep8 ON oep8.contract_hash = c.contract_hash
-        WHERE c.contract_hash = 'edf64937ca304ea8180fa92e2de36dc0a33cc712'
+        WHERE c.contract_hash = #{contractHash}
         LIMIT 1;
     </select>
 </mapper>

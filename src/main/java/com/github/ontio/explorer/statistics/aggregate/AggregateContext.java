@@ -1,5 +1,6 @@
 package com.github.ontio.explorer.statistics.aggregate;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.ontio.explorer.statistics.aggregate.model.ContractType;
 import com.github.ontio.explorer.statistics.common.ParamsConfig;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,27 +79,38 @@ public class AggregateContext {
 	}
 
 	public boolean isNativeContract(String contractHash) {
-		return config.getOntContractHash().equals(contractHash) || config.getOngContractHash().equals(contractHash);
+		return isOnt(contractHash) || isOng(contractHash);
+	}
+
+	public boolean isOnt(String contractHash) {
+		return config.getOntContractHash().equals(contractHash);
+	}
+
+	public boolean isOng(String contractHash) {
+		return config.getOngContractHash().equals(contractHash);
 	}
 
 	public boolean isOep4Contract(String contractHash) {
-		// TODO
-		return false;
+		return contractTypes.get(contractHash).isOep4();
 	}
 
 	public boolean isOep5Contract(String contractHash) {
-		// TODO
-		return false;
+		return contractTypes.get(contractHash).isOep5();
 	}
 
 	public boolean isOep8Contract(String contractHash) {
-		// TODO
-		return false;
+		return contractTypes.get(contractHash).isOep8();
 	}
 
 	@PostConstruct
 	public void init() {
-
+		contractTypes = Caffeine.newBuilder()
+				.maximumSize(4096)
+				.expireAfterAccess(Duration.ofHours(1))
+				.build(contractHash -> {
+					ContractType contractType = contractMapper.findContractType(contractHash);
+					return contractType == null ? ContractType.NULL : contractType;
+				});
 	}
 
 }

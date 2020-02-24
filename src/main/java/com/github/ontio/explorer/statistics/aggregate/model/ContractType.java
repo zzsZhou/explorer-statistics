@@ -11,13 +11,15 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class ContractType implements Serializable {
-	
+
+	public static final ContractType NULL = new ContractType();
+
 	private String contractHash;
-	
+
 	private boolean oep4;
-	
+
 	private boolean oep5;
-	
+
 	private boolean oep8;
-	
+
 }

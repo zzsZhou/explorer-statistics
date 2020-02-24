@@ -33,11 +33,11 @@ public class AggregateSourceProducer {
 
 	private RateLimiter rateLimiter;
 
-	private volatile int startId;
+	private volatile int startTxDetailId;
 
 	@Scheduled(initialDelay = 5000, fixedRate = 5000)
 	public void produceTransactionInfo() {
-		int id = startId;
+		int id = startTxDetailId;
 
 		while (true) {
 			Example example = new Example(TxDetail.class);
@@ -57,15 +57,15 @@ public class AggregateSourceProducer {
 			}
 		}
 
-		this.startId = id;
+		this.startTxDetailId = id;
 	}
 
 	@PostConstruct
 	public void initializeStartId() {
 		int txTime = currentMapper.findLastStatTxTime();
-		Integer startId = txDetailMapper.findLastIdBeforeTxTime(txTime);
-		if (startId != null) {
-			this.startId = startId;
+		Integer id = txDetailMapper.findLastIdBeforeTxTime(txTime);
+		if (id != null) {
+			this.startTxDetailId = id;
 		}
 		this.rateLimiter = RateLimiter.create(100.0);
 	}
