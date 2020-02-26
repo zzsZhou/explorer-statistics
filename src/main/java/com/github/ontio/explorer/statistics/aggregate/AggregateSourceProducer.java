@@ -1,5 +1,6 @@
 package com.github.ontio.explorer.statistics.aggregate;
 
+import com.github.ontio.explorer.statistics.aggregate.model.Tick;
 import com.github.ontio.explorer.statistics.aggregate.model.TransactionInfo;
 import com.github.ontio.explorer.statistics.aggregate.support.DisruptorEventDispatcher;
 import com.github.ontio.explorer.statistics.common.ParamsConfig;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.PostConstruct;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -101,6 +103,11 @@ public class AggregateSourceProducer {
 		}
 
 		this.startBlockHeight = blockHeight;
+	}
+
+	@Scheduled(initialDelay = 5000, fixedRate = 5000)
+	public void flushTotalAggregations() {
+		dispatcher.dispatch(new Tick(Duration.ofSeconds(5)));
 	}
 
 	@PostConstruct

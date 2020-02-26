@@ -44,4 +44,24 @@
         LIMIT 1
     </select>
 
+    <select id="findFirstBlockHeightAfterTxTime" resultType="java.lang.Integer">
+        SELECT block_height
+        FROM tbl_tx_detail
+        WHERE id = (SELECT id
+                    FROM tbl_tx_detail
+                    WHERE tx_time &gt;= #{txTime}
+                    ORDER BY id
+                    LIMIT 1)
+    </select>
+
+    <select id="findLastBlockHeightBeforeTxTime" resultType="java.lang.Integer">
+        SELECT block_height
+        FROM tbl_tx_detail
+        WHERE id = (SELECT id
+                    FROM tbl_tx_detail
+                    WHERE tx_time &lt; #{txTime}
+                    ORDER BY id DESC
+                    LIMIT 1)
+    </select>
+
 </mapper>

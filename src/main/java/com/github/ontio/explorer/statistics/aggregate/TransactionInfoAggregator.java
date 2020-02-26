@@ -8,7 +8,9 @@ import com.github.ontio.explorer.statistics.aggregate.model.AggregateKey;
 import com.github.ontio.explorer.statistics.aggregate.model.AggregateSnapshot;
 import com.github.ontio.explorer.statistics.aggregate.model.ContractAggregate.ContractAggregateKey;
 import com.github.ontio.explorer.statistics.aggregate.model.StagingAggregateKeys;
+import com.github.ontio.explorer.statistics.aggregate.model.Tick;
 import com.github.ontio.explorer.statistics.aggregate.model.TokenAggregate.TokenAggregateKey;
+import com.github.ontio.explorer.statistics.aggregate.model.TotalAggregationSnapshot;
 import com.github.ontio.explorer.statistics.aggregate.model.TransactionInfo;
 import com.github.ontio.explorer.statistics.aggregate.service.AggregateService;
 import com.github.ontio.explorer.statistics.aggregate.support.DateIdUtil;
@@ -63,7 +65,7 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 
 	@Override
 	protected Collection<Class<?>> eventTypes() {
-		return Arrays.asList(TransactionInfo.class, StagingAggregateKeys.class);
+		return Arrays.asList(TransactionInfo.class, StagingAggregateKeys.class, Tick.class);
 	}
 
 	@Override
@@ -75,6 +77,8 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 			StagingAggregateKeys keys = (StagingAggregateKeys) event;
 			log.info("clearing staging aggregates");
 			keys.getAggregateKeys().forEach(this.stagingAggregates::remove);
+		} else if (event instanceof Tick) {
+			flushTotalAggregations();
 		}
 	}
 
@@ -169,6 +173,15 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 			tokenContractHashes.add(VIRTUAL_CONTRACT_OEP4);
 		}
 		return tokenContractHashes;
+	}
+
+	private void flushTotalAggregations() {
+		int currentDateId = DateIdUtil.parseDateId((int) (System.currentTimeMillis() / 1000));
+		if (currentDateId == context.getDateId() && !currentAggregates.isEmpty()) {
+			TotalAggregationSnapshot snapshot = new TotalAggregationSnapshot();
+			snapshot.append(currentAggregates.values());
+			aggregationSinker.sink(snapshot);
+		}
 	}
 
 	@PostConstruct

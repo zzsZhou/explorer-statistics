@@ -8,7 +8,6 @@ import java.util.Set;
  */
 public interface UniqueCounter<T> {
 
-
 	void count(T... values);
 
 	int getCount();

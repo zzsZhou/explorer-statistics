@@ -30,4 +30,8 @@ public interface TxDetailMapper extends Mapper<TxDetail> {
 
     Integer findLatestBlockHeight();
 
+    Integer findFirstBlockHeightAfterTxTime(int txTime);
+
+    Integer findLastBlockHeightBeforeTxTime(int txTime);
+
 }

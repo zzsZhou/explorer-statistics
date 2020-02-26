@@ -4,26 +4,18 @@ import com.github.ontio.explorer.statistics.model.AddressDailyAggregation;
 import com.github.ontio.explorer.statistics.model.ContractDailyAggregation;
 import com.github.ontio.explorer.statistics.model.TokenDailyAggregation;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author LiuQi
  */
 @Getter
-@RequiredArgsConstructor
-public class AggregateSnapshot implements Serializable {
+public class TotalAggregationSnapshot implements Serializable {
 
-	private final int currentDateId;
-
-	private final int lastBlockHeight;
-
-	private Set<AggregateKey> aggregateKeys = new HashSet<>();
+	private static final int TOTAL_SNAPSHOT_DATE_ID = -1;
 
 	private List<AddressDailyAggregation> addressAggregations = new ArrayList<>(1024);
 
@@ -44,21 +36,24 @@ public class AggregateSnapshot implements Serializable {
 	}
 
 	private void append(AddressAggregate aggregate) {
-		aggregateKeys.add(aggregate.key());
-		aggregate.snapshot(false).ifPresent(addressAggregations::add);
-		aggregate.snapshot(true).ifPresent(addressAggregations::add);
+		aggregate.snapshot(true).ifPresent(aggregation -> {
+			aggregation.setDateId(TOTAL_SNAPSHOT_DATE_ID);
+			addressAggregations.add(aggregation);
+		});
 	}
 
 	private void append(TokenAggregate aggregate) {
-		aggregateKeys.add(aggregate.key());
-		aggregate.snapshot(false).ifPresent(tokenAggregations::add);
-		aggregate.snapshot(true).ifPresent(tokenAggregations::add);
+		aggregate.snapshot(true).ifPresent(aggregation -> {
+			aggregation.setDateId(TOTAL_SNAPSHOT_DATE_ID);
+			tokenAggregations.add(aggregation);
+		});
 	}
 
 	private void append(ContractAggregate aggregate) {
-		aggregateKeys.add(aggregate.key());
-		aggregate.snapshot(false).ifPresent(contractAggregations::add);
-		aggregate.snapshot(true).ifPresent(contractAggregations::add);
+		aggregate.snapshot(true).ifPresent(aggregation -> {
+			aggregation.setDateId(TOTAL_SNAPSHOT_DATE_ID);
+			contractAggregations.add(aggregation);
+		});
 	}
 
 }

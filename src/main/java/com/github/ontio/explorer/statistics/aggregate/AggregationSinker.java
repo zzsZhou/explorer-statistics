@@ -2,6 +2,7 @@ package com.github.ontio.explorer.statistics.aggregate;
 
 import com.github.ontio.explorer.statistics.aggregate.model.AggregateSnapshot;
 import com.github.ontio.explorer.statistics.aggregate.model.StagingAggregateKeys;
+import com.github.ontio.explorer.statistics.aggregate.model.TotalAggregationSnapshot;
 import com.github.ontio.explorer.statistics.aggregate.service.AggregateService;
 import com.github.ontio.explorer.statistics.aggregate.support.DateIdUtil;
 import com.github.ontio.explorer.statistics.aggregate.support.DisruptorEvent;
@@ -47,6 +48,8 @@ public class AggregationSinker implements DisruptorEventPublisher, EventHandler<
 		Object event = disruptorEvent.getEvent();
 		if (event instanceof AggregateSnapshot) {
 			persistAggregations((AggregateSnapshot) event);
+		} else if (event instanceof TotalAggregationSnapshot) {
+			flushTotalAggregations((TotalAggregationSnapshot) event);
 		}
 	}
 
@@ -57,11 +60,17 @@ public class AggregationSinker implements DisruptorEventPublisher, EventHandler<
 		}
 		aggregateService.saveAggregateSnapshot(snapshot);
 		dispatcher.dispatch(new StagingAggregateKeys(snapshot.getAggregateKeys()));
-		if (log.isInfoEnabled()) {
-			log.info("saved {} address aggregations, {} token aggregations, {} contract aggregations of date {}",
-					snapshot.getAddressAggregations().size(), snapshot.getTokenAggregations().size(),
-					snapshot.getContractAggregations().size(), date);
-		}
+		log.info("saved {} address aggregations, {} token aggregations, {} contract aggregations of date {}",
+				snapshot.getAddressAggregations().size(), snapshot.getTokenAggregations().size(),
+				snapshot.getContractAggregations().size(), date);
+	}
+
+	private void flushTotalAggregations(TotalAggregationSnapshot snapshot) {
+		log.info("flushing current total aggregations");
+		aggregateService.saveTotalAggregationSnapshot(snapshot);
+		log.info("flushed {} total address aggregations, {} total token aggregations, {} total contract aggregations",
+				snapshot.getAddressAggregations().size(), snapshot.getTokenAggregations().size(),
+				snapshot.getContractAggregations().size());
 	}
 
 }

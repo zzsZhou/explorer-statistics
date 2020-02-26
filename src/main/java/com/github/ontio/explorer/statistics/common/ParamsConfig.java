@@ -32,6 +32,8 @@ public class ParamsConfig {
 
     private double aggregationRateLimit = 100;
 
+    private int rankingLevel = 10;
+
     public interface Field {
 
         String maxStakingChangeCount = "maxStakingChangeCount";

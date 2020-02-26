@@ -7,6 +7,7 @@ import com.github.ontio.explorer.statistics.aggregate.model.AggregateKey;
 import com.github.ontio.explorer.statistics.aggregate.model.AggregateSnapshot;
 import com.github.ontio.explorer.statistics.aggregate.model.ContractAggregate;
 import com.github.ontio.explorer.statistics.aggregate.model.TokenAggregate;
+import com.github.ontio.explorer.statistics.aggregate.model.TotalAggregationSnapshot;
 import com.github.ontio.explorer.statistics.mapper.AddressDailyAggregationMapper;
 import com.github.ontio.explorer.statistics.mapper.ContractDailyAggregationMapper;
 import com.github.ontio.explorer.statistics.mapper.CurrentMapper;
@@ -29,7 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AggregateService {
 
-	private static final int DATABASE_BATCH_SIZE = 500;
+	private static final int DATABASE_BATCH_SIZE = 1000;
 
 	private final AggregateContext context;
 
@@ -105,7 +106,20 @@ public class AggregateService {
 
 	@Transactional
 	public void saveAggregateSnapshot(AggregateSnapshot snapshot) {
-		List<AddressDailyAggregation> addressAggregations = snapshot.getAddressAggregations();
+		saveAddressAggregations(snapshot.getAddressAggregations());
+		saveTokenAggregations(snapshot.getTokenAggregations());
+		saveContractAggregations(snapshot.getContractAggregations());
+		currentMapper.saveLastStatBlockHeight(snapshot.getLastBlockHeight());
+	}
+
+	@Transactional
+	public void saveTotalAggregationSnapshot(TotalAggregationSnapshot snapshot) {
+		saveAddressAggregations(snapshot.getAddressAggregations());
+		saveTokenAggregations(snapshot.getTokenAggregations());
+		saveContractAggregations(snapshot.getContractAggregations());
+	}
+
+	private void saveAddressAggregations(List<AddressDailyAggregation> addressAggregations) {
 		if (addressAggregations.size() > 0) {
 			for (int i = 0; (DATABASE_BATCH_SIZE * i) < addressAggregations.size(); i++) {
 				int from = DATABASE_BATCH_SIZE * i;
@@ -113,8 +127,9 @@ public class AggregateService {
 				addressDailyAggregationMapper.batchSave(addressAggregations.subList(from, to));
 			}
 		}
+	}
 
-		List<TokenDailyAggregation> tokenAggregations = snapshot.getTokenAggregations();
+	private void saveTokenAggregations(List<TokenDailyAggregation> tokenAggregations) {
 		if (tokenAggregations.size() > 0) {
 			for (int i = 0; (DATABASE_BATCH_SIZE * i) < tokenAggregations.size(); i++) {
 				int from = DATABASE_BATCH_SIZE * i;
@@ -122,8 +137,9 @@ public class AggregateService {
 				tokenDailyAggregationMapper.batchSave(tokenAggregations.subList(from, to));
 			}
 		}
+	}
 
-		List<ContractDailyAggregation> contractAggregations = snapshot.getContractAggregations();
+	private void saveContractAggregations(List<ContractDailyAggregation> contractAggregations) {
 		if (contractAggregations.size() > 0) {
 			for (int i = 0; (DATABASE_BATCH_SIZE * i) < contractAggregations.size(); i++) {
 				int from = DATABASE_BATCH_SIZE * i;
@@ -131,8 +147,6 @@ public class AggregateService {
 				contractDailyAggregationMapper.batchSave(contractAggregations.subList(from, to));
 			}
 		}
-
-		currentMapper.saveLastStatBlockHeight(snapshot.getLastBlockHeight());
 	}
 
 }
