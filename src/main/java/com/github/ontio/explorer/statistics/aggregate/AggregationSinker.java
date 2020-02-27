@@ -46,10 +46,14 @@ public class AggregationSinker implements DisruptorEventPublisher, EventHandler<
 	@Override
 	public void onEvent(DisruptorEvent disruptorEvent, long sequence, boolean endOfBatch) {
 		Object event = disruptorEvent.getEvent();
-		if (event instanceof AggregateSnapshot) {
-			persistAggregations((AggregateSnapshot) event);
-		} else if (event instanceof TotalAggregationSnapshot) {
-			flushTotalAggregations((TotalAggregationSnapshot) event);
+		try {
+			if (event instanceof AggregateSnapshot) {
+				persistAggregations((AggregateSnapshot) event);
+			} else if (event instanceof TotalAggregationSnapshot) {
+				flushTotalAggregations((TotalAggregationSnapshot) event);
+			}
+		} catch (Exception e) {
+			log.error("error saving/flushing aggregations", e);
 		}
 	}
 

@@ -47,27 +47,30 @@ public class AggregateSourceProducer {
 	public void produceTransactionInfo() {
 		int id = startTxDetailId;
 
-		while (true) {
-			Example example = new Example(TxDetail.class);
-			example.and().andGreaterThan("id", id).andIn("eventType", Arrays.asList(2, 3));
-			example.orderBy("id");
-			List<TxDetail> details = txDetailMapper.selectByExampleAndRowBounds(example, new RowBounds(0, BATCH_SIZE));
+		try {
+			while (true) {
+				Example example = new Example(TxDetail.class);
+				example.and().andGreaterThan("id", id).andIn("eventType", Arrays.asList(2, 3));
+				example.orderBy("id");
+				List<TxDetail> details = txDetailMapper.selectByExampleAndRowBounds(example, new RowBounds(0, BATCH_SIZE));
 
-			if (details == null || details.isEmpty()) {
-				break;
-			}
-
-			for (TxDetail detail : details) {
-				if (rateLimiter != null) {
-					rateLimiter.acquire();
+				if (details == null || details.isEmpty()) {
+					break;
 				}
-				TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
-				dispatcher.dispatch(transactionInfo);
-				id = detail.getId();
+
+				for (TxDetail detail : details) {
+					if (rateLimiter != null) {
+						rateLimiter.acquire();
+					}
+					TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
+					dispatcher.dispatch(transactionInfo);
+					id = detail.getId();
+				}
 			}
+		} finally {
+			this.startTxDetailId = id;
 		}
 
-		this.startTxDetailId = id;
 	}
 
 	@Scheduled(initialDelay = 5000, fixedRate = 5000)
@@ -78,31 +81,33 @@ public class AggregateSourceProducer {
 		}
 		int blockHeight = this.startBlockHeight;
 
-		while (blockHeight < latestBlockHeight) {
-			Example example = new Example(TxDetail.class);
-			example.and()
-					.andGreaterThan("blockHeight", blockHeight)
-					.andLessThanOrEqualTo("blockHeight", blockHeight + BLOCK_BATCH_SIZE)
-					.andIn("eventType", Arrays.asList(2, 3));
-			example.orderBy("blockHeight").orderBy("blockIndex").orderBy("txIndex");
-			List<TxDetail> details = txDetailMapper.selectByExample(example);
+		try {
+			while (blockHeight < latestBlockHeight) {
+				Example example = new Example(TxDetail.class);
+				example.and()
+						.andGreaterThan("blockHeight", blockHeight)
+						.andLessThanOrEqualTo("blockHeight", blockHeight + BLOCK_BATCH_SIZE)
+						.andIn("eventType", Arrays.asList(2, 3));
+				example.orderBy("blockHeight").orderBy("blockIndex").orderBy("txIndex");
+				List<TxDetail> details = txDetailMapper.selectByExample(example);
 
-			if (details == null || details.isEmpty()) {
-				blockHeight += BLOCK_BATCH_SIZE;
-				continue;
-			}
-
-			for (TxDetail detail : details) {
-				if (rateLimiter != null) {
-					rateLimiter.acquire();
+				if (details == null || details.isEmpty()) {
+					blockHeight += BLOCK_BATCH_SIZE;
+					continue;
 				}
-				TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
-				dispatcher.dispatch(transactionInfo);
-				blockHeight = detail.getBlockHeight();
-			}
-		}
 
-		this.startBlockHeight = blockHeight;
+				for (TxDetail detail : details) {
+					if (rateLimiter != null) {
+						rateLimiter.acquire();
+					}
+					TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
+					dispatcher.dispatch(transactionInfo);
+					blockHeight = detail.getBlockHeight();
+				}
+			}
+		} finally {
+			this.startBlockHeight = blockHeight;
+		}
 	}
 
 	@Scheduled(initialDelay = 5000, fixedRate = 5000)

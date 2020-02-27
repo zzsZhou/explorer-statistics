@@ -89,7 +89,7 @@ public class RankingGroupers {
 
 	@Bean
 	RankingGrouper<TokenRanking> tokenWithdrawAddressCountGrouper(ParamsConfig config) {
-		return new IntRankingGrouper<>(config, RANKING_GROUP_TOKEN, RankingGrouper.RANKING_ID_DEPOSIT_ADDR,
+		return new IntRankingGrouper<>(config, RANKING_GROUP_TOKEN, RankingGrouper.RANKING_ID_WITHDRAW_ADDR,
 				TokenRanking::getWithdrawAddressCount, true);
 	}
 

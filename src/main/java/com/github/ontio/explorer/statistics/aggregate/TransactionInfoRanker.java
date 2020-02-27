@@ -12,6 +12,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import java.util.Map;
  * @author LiuQi
  */
 @Component
+@Slf4j
 public class TransactionInfoRanker implements DisruptorEventPublisher, EventHandler<DisruptorEvent> {
 
 	private final AggregateContext context;
@@ -48,12 +50,16 @@ public class TransactionInfoRanker implements DisruptorEventPublisher, EventHand
 	@Override
 	public void onEvent(DisruptorEvent disruptorEvent, long sequence, boolean endOfBatch) {
 		Object event = disruptorEvent.getEvent();
-		if (event instanceof RankingDuration.Begin) {
-			beginRanking((RankingDuration.Begin) event);
-		} else if (event instanceof RankingDuration.End) {
-			endRanking((RankingDuration.End) event);
-		} else if (event instanceof TransactionInfo) {
-			doRank((TransactionInfo) event);
+		try {
+			if (event instanceof RankingDuration.Begin) {
+				beginRanking((RankingDuration.Begin) event);
+			} else if (event instanceof RankingDuration.End) {
+				endRanking((RankingDuration.End) event);
+			} else if (event instanceof TransactionInfo) {
+				doRank((TransactionInfo) event);
+			}
+		} catch (Exception e) {
+			log.error("error processing ranking", e);
 		}
 	}
 

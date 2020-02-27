@@ -52,7 +52,8 @@ public class RankingSourceProducer {
 		Integer endBlockHeight = txDetailMapper.findLastBlockHeightBeforeTxTime(endTxTime);
 
 		try {
-			duration.involved().stream().map(d -> new RankingDuration.Begin(d, duration.getTxTimeBarrier(dt))).forEach(ranker::publish);
+			log.info("producing transaction info for {} rankings", duration);
+			duration.involved().stream().map(d -> new RankingDuration.Begin(d, d.getTxTimeBarrier(dt))).forEach(ranker::publish);
 
 			while (beginBlockHeight < endBlockHeight) {
 				Example example = new Example(TxDetail.class);
@@ -74,6 +75,8 @@ public class RankingSourceProducer {
 					beginBlockHeight = detail.getBlockHeight();
 				}
 			}
+		} catch (Exception e) {
+			log.error("error submitting transaction info for ranking", e);
 		} finally {
 			duration.involved().stream().map(RankingDuration.End::new).forEach(ranker::publish);
 		}
