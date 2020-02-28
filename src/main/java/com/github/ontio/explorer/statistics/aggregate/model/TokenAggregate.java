@@ -64,9 +64,17 @@ public class TokenAggregate extends AbstractAggregate<TokenAggregate.TokenAggreg
 	protected void aggregateGas(TransactionInfo transactionInfo) {
 		BigDecimal fee = transactionInfo.getFee();
 		BigDecimal amount = transactionInfo.getAmount();
+		String from = transactionInfo.getFromAddress();
+		String to = transactionInfo.getToAddress();
+
 		if (isTxHashChanged(transactionInfo)) {
 			this.txCount++;
 			this.total.txCount++;
+		}
+		if (this.txCount > 0) {
+			this.depositAddressCounter.count(to);
+			this.withdrawAddressCounter.count(from);
+			this.txAddressCounter.count(from, to);
 		}
 
 		this.txAmount = this.txAmount.add(amount);
@@ -132,7 +140,7 @@ public class TokenAggregate extends AbstractAggregate<TokenAggregate.TokenAggreg
 
 		TokenDailyAggregation snapshot = new TokenDailyAggregation();
 		snapshot.setTokenContractHash(key().getTokenContractHash());
-		snapshot.setDateId(0);
+		snapshot.setDateId(context.getConfig().getTotalAggregationDateId());
 		snapshot.setUsdPrice(ZERO);
 		snapshot.setTxCount(total.txCount);
 		snapshot.setTxAmount(total.txAmount);

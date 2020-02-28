@@ -111,12 +111,17 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 	protected void aggregateGas(TransactionInfo transactionInfo) {
 		BigDecimal amount = transactionInfo.getAmount();
 		contractCounter.count(transactionInfo.getContractHash());
+		String from = transactionInfo.getFromAddress();
+		String to = transactionInfo.getToAddress();
+
 		if (transactionInfo.getFromAddress().equals(key().getAddress())) {
 			if (isTxHashChanged(transactionInfo)) {
 				withdrawTxCount++;
 				total.withdrawTxCount++;
 			}
 			withdrawAmount = withdrawAmount.add(amount);
+			withdrawAddressCounter.count(to);
+			txAddressCounter.count(to);
 			total.withdrawAmount = total.withdrawAmount.add(amount);
 
 			if (context.virtualContracts().contains(key().getTokenContractHash())) {
@@ -129,6 +134,8 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 				total.depositTxCount++;
 			}
 			depositAmount = depositAmount.add(amount);
+			depositAddressCounter.count(from);
+			txAddressCounter.count(from);
 			total.depositAmount = total.depositAmount.add(amount);
 		}
 		changed = true;
@@ -214,7 +221,7 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 		AddressDailyAggregation snapshot = new AddressDailyAggregation();
 		snapshot.setAddress(key().getAddress());
 		snapshot.setTokenContractHash(key().getTokenContractHash());
-		snapshot.setDateId(0);
+		snapshot.setDateId(context.getConfig().getTotalAggregationDateId());
 		snapshot.setBalance(total.balance);
 		snapshot.setUsdPrice(ZERO); // TODO 0 for now
 		snapshot.setMaxBalance(total.balanceRanker.getMax());

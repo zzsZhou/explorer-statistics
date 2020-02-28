@@ -34,6 +34,8 @@ public class ParamsConfig {
 
     private int rankingLevel = 10;
 
+    private int totalAggregationDateId;
+
     public interface Field {
 
         String maxStakingChangeCount = "maxStakingChangeCount";

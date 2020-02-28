@@ -64,6 +64,8 @@ public class ContractAggregate extends AbstractAggregate<ContractAggregate.Contr
 			}
 
 			txAmount = txAmount.add(amount);
+			depositAddressCounter.count(to);
+			withdrawAddressCounter.count(from);
 			txAddressCounter.count(from, to);
 			total.txAmount = total.txAmount.add(amount);
 		}
@@ -75,11 +77,18 @@ public class ContractAggregate extends AbstractAggregate<ContractAggregate.Contr
 	protected void aggregateGas(TransactionInfo transactionInfo) {
 		BigDecimal amount = transactionInfo.getAmount();
 		BigDecimal fee = transactionInfo.getFee();
+		String from = transactionInfo.getFromAddress();
+		String to = transactionInfo.getToAddress();
 
 		contractCounter.count(transactionInfo.getContractHash());
 		if (isTxHashChanged(transactionInfo)) {
 			txCount++;
 			total.txCount++;
+		}
+		if (txCount > 0) {
+			depositAddressCounter.count(to);
+			withdrawAddressCounter.count(from);
+			txAddressCounter.count(from, to);
 		}
 		if (context.virtualContracts().contains(key().getTokenContractHash())) {
 			feeAmount = feeAmount.add(fee);
@@ -151,7 +160,7 @@ public class ContractAggregate extends AbstractAggregate<ContractAggregate.Contr
 		ContractDailyAggregation snapshot = new ContractDailyAggregation();
 		snapshot.setContractHash(key().getContractHash());
 		snapshot.setTokenContractHash(key().getTokenContractHash());
-		snapshot.setDateId(0);
+		snapshot.setDateId(context.getConfig().getTotalAggregationDateId());
 		snapshot.setTxCount(total.txCount);
 		snapshot.setTxAmount(total.txAmount);
 		snapshot.setDepositAddressCount(0);

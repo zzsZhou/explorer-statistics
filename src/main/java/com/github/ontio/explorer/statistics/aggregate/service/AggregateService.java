@@ -57,13 +57,16 @@ public class AggregateService {
 	private AddressAggregate createBaselineAggregate(AddressAggregate.AddressAggregateKey key) {
 		Example example = new Example(AddressDailyAggregation.class);
 		Example.Criteria criteria = example.and();
-		criteria.andEqualTo("address", key.getAddress()).andEqualTo("tokenContractHash", key.getTokenContractHash());
+		criteria.andEqualTo("address", key.getAddress())
+				.andEqualTo("tokenContractHash", key.getTokenContractHash())
+				.andGreaterThan("dateId", 0)
+				.andLessThan("dateId", context.getDateId());
 		example.orderBy("dateId").desc();
 		List<AddressDailyAggregation> data = addressDailyAggregationMapper.selectByExampleAndRowBounds(example,
 				new RowBounds(0, 1));
 		AddressDailyAggregation baseline = data == null || data.isEmpty() ? null : data.get(0);
 
-		criteria.andEqualTo("dateId", 0);
+		criteria.andEqualTo("dateId", context.getConfig().getTotalAggregationDateId());
 		AddressDailyAggregation total = addressDailyAggregationMapper.selectOneByExample(example);
 
 		AddressAggregate aggregate = new AddressAggregate(context, key);
@@ -74,12 +77,14 @@ public class AggregateService {
 	private TokenAggregate createBaselineAggregate(TokenAggregate.TokenAggregateKey key) {
 		Example example = new Example(TokenDailyAggregation.class);
 		Example.Criteria criteria = example.and();
-		criteria.andEqualTo("tokenContractHash", key.getTokenContractHash());
+		criteria.andEqualTo("tokenContractHash", key.getTokenContractHash())
+				.andGreaterThan("dateId", 0)
+				.andLessThan("dateId", context.getDateId());
 		example.orderBy("dateId").desc();
 		List<TokenDailyAggregation> data = tokenDailyAggregationMapper.selectByExampleAndRowBounds(example, new RowBounds(0, 1));
 		TokenDailyAggregation baseline = data == null || data.isEmpty() ? null : data.get(0);
 
-		criteria.andEqualTo("dateId", 0);
+		criteria.andEqualTo("dateId", context.getConfig().getTotalAggregationDateId());
 		TokenDailyAggregation total = tokenDailyAggregationMapper.selectOneByExample(example);
 
 		TokenAggregate aggregate = new TokenAggregate(context, key);
@@ -90,13 +95,16 @@ public class AggregateService {
 	private ContractAggregate createBaselineAggregate(ContractAggregate.ContractAggregateKey key) {
 		Example example = new Example(ContractDailyAggregation.class);
 		Example.Criteria criteria = example.and();
-		criteria.andEqualTo("contractHash", key.getContractHash()).andEqualTo("tokenContractHash", key.getTokenContractHash());
+		criteria.andEqualTo("contractHash", key.getContractHash())
+				.andEqualTo("tokenContractHash", key.getTokenContractHash())
+				.andGreaterThan("dateId", 0)
+				.andLessThan("dateId", context.getDateId());
 		example.orderBy("dateId").desc();
 		List<ContractDailyAggregation> data = contractDailyAggregationMapper.selectByExampleAndRowBounds(example,
 				new RowBounds(0, 1));
 		ContractDailyAggregation baseline = data == null || data.isEmpty() ? null : data.get(0);
 
-		criteria.andEqualTo("dateId", 0);
+		criteria.andEqualTo("dateId", context.getConfig().getTotalAggregationDateId());
 		ContractDailyAggregation total = contractDailyAggregationMapper.selectOneByExample(example);
 
 		ContractAggregate aggregate = new ContractAggregate(context, key);
