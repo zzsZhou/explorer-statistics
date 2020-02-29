@@ -85,7 +85,7 @@ public class AggregateService {
 		List<TokenDailyAggregation> data = tokenDailyAggregationMapper.selectByExampleAndRowBounds(example, new RowBounds(0, 1));
 		TokenDailyAggregation baseline = data == null || data.isEmpty() ? null : data.get(0);
 
-		example = new Example(ContractDailyAggregation.class);
+		example = new Example(TokenDailyAggregation.class);
 		example.and().andEqualTo("tokenContractHash", key.getTokenContractHash())
 				.andEqualTo("dateId", context.getConfig().getTotalAggregationDateId());
 		TokenDailyAggregation total = tokenDailyAggregationMapper.selectOneByExample(example);
