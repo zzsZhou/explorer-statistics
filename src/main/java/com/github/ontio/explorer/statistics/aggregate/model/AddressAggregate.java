@@ -63,6 +63,9 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 				}
 				withdrawAddressCounter.count(to);
 				txAddressCounter.count(to);
+				if (transactionInfo.isSelfTransaction()) {
+					depositAddressCounter.count(from);
+				}
 			} else if (to.equals(key().getAddress())) {
 				if (isTxHashChanged(transactionInfo)) {
 					depositTxCount++;
@@ -79,13 +82,19 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 					total.withdrawTxCount++;
 				}
 
-				balance = balance.subtract(amount);
 				withdrawAmount = withdrawAmount.add(amount);
 				withdrawAddressCounter.count(to);
 				txAddressCounter.count(to);
-
-				total.balance = total.balance.subtract(amount);
 				total.withdrawAmount = total.withdrawAmount.add(amount);
+
+				if (transactionInfo.isSelfTransaction()) {
+					depositAmount = depositAmount.add(amount);
+					depositAddressCounter.count(from);
+					total.depositAmount = total.depositAmount.add(amount);
+				} else {
+					balance = balance.subtract(amount);
+					total.balance = total.balance.subtract(amount);
+				}
 			} else if (to.equals(key().getAddress())) {
 				if (isTxHashChanged(transactionInfo)) {
 					depositTxCount++;
@@ -110,21 +119,29 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 	@Override
 	protected void aggregateGas(TransactionInfo transactionInfo) {
 		BigDecimal amount = transactionInfo.getAmount();
-		contractCounter.count(transactionInfo.getContractHash());
 		String from = transactionInfo.getFromAddress();
 		String to = transactionInfo.getToAddress();
 
+		contractCounter.count(transactionInfo.getContractHash());
 		if (transactionInfo.getFromAddress().equals(key().getAddress())) {
 			if (isTxHashChanged(transactionInfo)) {
 				withdrawTxCount++;
 				total.withdrawTxCount++;
 			}
 
-			balance = balance.subtract(amount);
 			withdrawAmount = withdrawAmount.add(amount);
 			withdrawAddressCounter.count(to);
 			txAddressCounter.count(to);
 			total.withdrawAmount = total.withdrawAmount.add(amount);
+
+			if (transactionInfo.isSelfTransaction()) {
+				depositAmount = depositAmount.add(amount);
+				depositAddressCounter.count(from);
+				total.depositAmount = total.depositAmount.add(amount);
+			} else {
+				balance = balance.subtract(amount);
+				total.balance = total.balance.subtract(amount);
+			}
 
 			if (context.virtualContracts().contains(key().getTokenContractHash())) {
 				feeAmount = feeAmount.add(transactionInfo.getFee());
@@ -135,13 +152,15 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 				depositTxCount++;
 				total.depositTxCount++;
 			}
-
 			balance = balance.add(amount);
 			depositAmount = depositAmount.add(amount);
 			depositAddressCounter.count(from);
 			txAddressCounter.count(from);
+			total.balance = total.balance.add(amount);
 			total.depositAmount = total.depositAmount.add(amount);
 		}
+		balanceRanker.rank(balance);
+		total.balanceRanker.rank(total.balance);
 		changed = true;
 		total.changed = true;
 	}

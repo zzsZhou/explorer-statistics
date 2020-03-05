@@ -40,6 +40,11 @@ public class AggregateContext {
 	 */
 	public static final String VIRTUAL_CONTRACT_OEP4 = "$$OEP4$$";
 
+	/**
+	 * 治理合约地址
+	 */
+	public static final String GOVERNOR_ADDRESS = "AFmseVrdL9f9oyCzZefL9tG6UbviEH9ugK";
+
 	private static final Collection<String> VIRTUAL_CONTRACTS;
 
 	static {
@@ -101,6 +106,10 @@ public class AggregateContext {
 
 	public boolean isOep8Contract(String contractHash) {
 		return contractTypes.get(contractHash).isOep8();
+	}
+
+	public boolean isGovernor(String address) {
+		return GOVERNOR_ADDRESS.equals(address);
 	}
 
 	@PostConstruct

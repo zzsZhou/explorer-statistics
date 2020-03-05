@@ -30,9 +30,15 @@ public class CompositeRanking implements Ranking {
 
 	@Override
 	public void rank(TransactionInfo transactionInfo) {
-		getAddressRanking(transactionInfo.getFromAddress()).rank(transactionInfo);
+		String from = transactionInfo.getFromAddress();
+		if (!context.isGovernor(from)) {
+			getAddressRanking(from).rank(transactionInfo);
+		}
 		if (!transactionInfo.isSelfTransaction()) {
-			getAddressRanking(transactionInfo.getToAddress()).rank(transactionInfo);
+			String to = transactionInfo.getToAddress();
+			if (!context.isGovernor(to)) {
+				getAddressRanking(to).rank(transactionInfo);
+			}
 		}
 
 		String tokenContractHash = transactionInfo.getContractHash();
