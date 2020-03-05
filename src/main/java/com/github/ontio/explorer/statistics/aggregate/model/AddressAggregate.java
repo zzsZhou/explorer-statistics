@@ -119,6 +119,8 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 				withdrawTxCount++;
 				total.withdrawTxCount++;
 			}
+
+			balance = balance.subtract(amount);
 			withdrawAmount = withdrawAmount.add(amount);
 			withdrawAddressCounter.count(to);
 			txAddressCounter.count(to);
@@ -133,6 +135,8 @@ public class AddressAggregate extends AbstractAggregate<AddressAggregate.Address
 				depositTxCount++;
 				total.depositTxCount++;
 			}
+
+			balance = balance.add(amount);
 			depositAmount = depositAmount.add(amount);
 			depositAddressCounter.count(from);
 			txAddressCounter.count(from);
