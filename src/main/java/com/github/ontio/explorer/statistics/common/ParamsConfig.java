@@ -1,13 +1,10 @@
 package com.github.ontio.explorer.statistics.common;
 
-import io.swagger.models.auth.In;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +25,16 @@ public class ParamsConfig {
     private Boolean isTestNet;
 
     private int maxStakingChangeCount;
+
+    private String ontContractHash = "0100000000000000000000000000000000000000";
+
+    private String ongContractHash = "0200000000000000000000000000000000000000";
+
+    private double aggregationRateLimit = 200;
+
+    private int rankingLevel = 10;
+
+    private int totalAggregationDateId;
 
     public interface Field {
 

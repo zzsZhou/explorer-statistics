@@ -5,12 +5,21 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <result column="block_height" jdbcType="INTEGER" property="blockHeight" />
-    <result column="tx_count" jdbcType="INTEGER" property="txCount" />
-    <result column="ontid_count" jdbcType="INTEGER" property="ontidCount" />
-    <result column="nonontid_tx_count" jdbcType="INTEGER" property="nonontidTxCount" />
+    <result column="block_height" jdbcType="INTEGER" property="blockHeight"/>
+    <result column="tx_count" jdbcType="INTEGER" property="txCount"/>
+    <result column="ontid_count" jdbcType="INTEGER" property="ontidCount"/>
+    <result column="nonontid_tx_count" jdbcType="INTEGER" property="nonontidTxCount"/>
   </resultMap>
   <!--
     self-defined SQL
   -->
+  <select id="findLastStatBlockHeight" resultType="java.lang.Integer">
+    SELECT last_stat_block_height
+    FROM tbl_current;
+  </select>
+
+  <update id="saveLastStatBlockHeight">
+    UPDATE tbl_current
+    SET last_stat_block_height = #{blockHeight}
+  </update>
 </mapper>

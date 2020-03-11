@@ -15,6 +15,7 @@
 
 package com.github.ontio.explorer.statistics.mapper;
 
+import com.github.ontio.explorer.statistics.aggregate.model.ContractType;
 import com.github.ontio.explorer.statistics.model.Contract;
 import org.springframework.stereotype.Repository;
 import tk.mybatis.mapper.common.Mapper;
@@ -25,4 +26,6 @@ import java.util.List;
 public interface ContractMapper extends Mapper<Contract> {
     // self-defined SQL
     List<Contract> selectAllApprovedContract();
+    
+    ContractType findContractType(String contractHash);
 }

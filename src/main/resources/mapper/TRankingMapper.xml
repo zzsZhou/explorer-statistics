@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.ontio.explorer.statistics.mapper.TRankingMapper">
+    <resultMap id="BaseResultMap" type="com.github.ontio.explorer.statistics.model.TRanking">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="ranking_group" jdbcType="SMALLINT" property="rankingGroup"/>
+        <result column="ranking_id" jdbcType="SMALLINT" property="rankingId"/>
+        <result column="ranking_duration" jdbcType="SMALLINT" property="rankingDuration"/>
+        <result column="ranking" jdbcType="SMALLINT" property="ranking"/>
+        <result column="member" jdbcType="VARCHAR" property="member"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="percentage" jdbcType="DECIMAL" property="percentage"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <insert id="saveRankings">
+        INSERT INTO tbl_ranking
+        (
+        ranking_group,
+        ranking_id,
+        ranking_duration,
+        ranking,
+        member,
+        amount,
+        percentage
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.rankingGroup},
+            #{item.rankingId},
+            #{item.rankingDuration},
+            #{item.ranking},
+            #{item.member},
+            #{item.amount},
+            #{item.percentage}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        member=values(member),
+        amount=values(amount),
+        percentage=values(percentage)
+    </insert>
+
+    <delete id="deleteRankings">
+        DELETE
+        FROM tbl_ranking
+        WHERE ranking_group = #{group} AND ranking_id = #{id} AND ranking_duration = #{duration}
+    </delete>
+</mapper>

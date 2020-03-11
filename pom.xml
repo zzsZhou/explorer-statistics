@@ -17,6 +17,8 @@
     <properties>
         <java.version>1.8</java.version>
         <springfox.version>2.9.2</springfox.version>
+        <disruptor.version>3.4.2</disruptor.version>
+        <guava.version>28.2-jre</guava.version>
     </properties>
 
     <dependencies>
@@ -98,6 +100,25 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.59</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>${disruptor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -122,6 +143,11 @@
                         <groupId>tk.mybatis</groupId>
                         <artifactId>mapper-spring-boot-starter</artifactId>
                         <version>1.2.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysql.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
