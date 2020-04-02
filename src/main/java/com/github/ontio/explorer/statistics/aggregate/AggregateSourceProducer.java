@@ -103,6 +103,7 @@ public class AggregateSourceProducer {
 					}
 					TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
 					dispatcher.dispatch(transactionInfo);
+					blockHeight = detail.getBlockHeight();
 					currentBlockHeight = detail.getBlockHeight();
 				}
 			}
