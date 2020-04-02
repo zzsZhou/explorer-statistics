@@ -46,11 +46,11 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 	private final AggregateService aggregateService;
 
 	private final AggregationSinker aggregationSinker;
-
+	//当天最新的统计信息
 	private Map<AggregateKey, Aggregate<?, ?>> currentAggregates;
-
+	//缓存前一天的统计信息（防止0点左右baseline过期且数据还未插入db，此时数据不准，可能是前两天的数据）
 	private Map<AggregateKey, Aggregate<?, ?>> stagingAggregates;
-
+	//DB中前一天的统计信息
 	private LoadingCache<AggregateKey, Aggregate<?, ?>> baselineAggregates;
 
 	private int aggregated;
@@ -72,12 +72,15 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 	public void onEvent(DisruptorEvent disruptorEvent, long sequence, boolean endOfBatch) {
 		Object event = disruptorEvent.getEvent();
 		if (event instanceof TransactionInfo) {
+			//记录当天统计数据
 			aggregate((TransactionInfo) event);
 		} else if (event instanceof StagingAggregateKeys) {
+			//清除缓存stagingAggregates里的该key对应的统计数据，在数据插入db完成时触发
 			StagingAggregateKeys keys = (StagingAggregateKeys) event;
 			log.info("clearing staging aggregates");
 			keys.getAggregateKeys().forEach(this.stagingAggregates::remove);
 		} else if (event instanceof Tick) {
+			//定时刷新汇总统计数据到db
 			flushTotalAggregations();
 		}
 	}
@@ -90,13 +93,14 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 		}
 		log.debug("aggregating transaction info: {}", transactionInfo);
 
+		//0点之后的第一次跑批触发，插入前一天的统计数据
 		if (transactionInfo.getDateId() > currentDateId) {
 			if (currentDateId != 0) {
 				sinkSnapshot();
 			}
 			context.setDateId(transactionInfo.getDateId());
 		}
-
+		//记录统计信息到currentAggregates
 		selectAggregateKeys(transactionInfo).forEach(key -> {
 			Aggregate<?, ?> aggregate = getAggregate(key);
 			aggregate.aggregate(transactionInfo);
@@ -113,9 +117,11 @@ public class TransactionInfoAggregator extends DisruptorEventPublisherAdapter {
 		if (log.isInfoEnabled()) {
 			log.info("sinking aggregations of date {}", DateIdUtil.toDateString(context.getDateId()));
 		}
+		//将当天统计数据放入缓存stagingAggregates
 		currentAggregates.forEach((key, aggregate) -> stagingAggregates.put(key, aggregate));
 		AggregateSnapshot snapshot = new AggregateSnapshot(context.getDateId(), context.getBlockHeight());
 		snapshot.append(currentAggregates.values());
+		//清空当天的统计数据
 		currentAggregates = new HashMap<>();
 		aggregationSinker.sink(snapshot);
 	}

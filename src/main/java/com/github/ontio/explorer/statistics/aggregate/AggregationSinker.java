@@ -48,8 +48,10 @@ public class AggregationSinker implements DisruptorEventPublisher, EventHandler<
 		Object event = disruptorEvent.getEvent();
 		try {
 			if (event instanceof AggregateSnapshot) {
+				//记录前一天的统计数据信息
 				persistAggregations((AggregateSnapshot) event);
 			} else if (event instanceof TotalAggregationSnapshot) {
+				//刷新汇总统计信息
 				flushTotalAggregations((TotalAggregationSnapshot) event);
 			}
 		} catch (Exception e) {
@@ -63,6 +65,7 @@ public class AggregationSinker implements DisruptorEventPublisher, EventHandler<
 			log.info("saving aggregations of date {}", date);
 		}
 		aggregateService.saveAggregateSnapshot(snapshot);
+		//分发该key，说明该key对应的数据已经存入db
 		dispatcher.dispatch(new StagingAggregateKeys(snapshot.getAggregateKeys()));
 		log.info("saved {} address aggregations, {} token aggregations, {} contract aggregations of date {}",
 				snapshot.getAddressAggregations().size(), snapshot.getTokenAggregations().size(),

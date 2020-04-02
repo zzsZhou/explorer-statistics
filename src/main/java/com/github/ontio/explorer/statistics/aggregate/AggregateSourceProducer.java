@@ -112,6 +112,9 @@ public class AggregateSourceProducer {
 		}
 	}
 
+	/**
+	 * 相当于定时器，每5秒刷新汇总统计数据
+	 */
 	@Scheduled(initialDelay = 5000, fixedRate = 5000)
 	public void flushTotalAggregations() {
 		dispatcher.dispatch(new Tick(Duration.ofSeconds(5)));
