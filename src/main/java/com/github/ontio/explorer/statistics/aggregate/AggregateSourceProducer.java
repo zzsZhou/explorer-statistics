@@ -80,6 +80,7 @@ public class AggregateSourceProducer {
 			return;
 		}
 		int blockHeight = this.startBlockHeight;
+		int currentBlockHeight = blockHeight;
 
 		try {
 			while (blockHeight < latestBlockHeight) {
@@ -103,10 +104,11 @@ public class AggregateSourceProducer {
 					TransactionInfo transactionInfo = TransactionInfo.wrap(detail);
 					dispatcher.dispatch(transactionInfo);
 					blockHeight = detail.getBlockHeight();
+					currentBlockHeight = detail.getBlockHeight();
 				}
 			}
 		} finally {
-			this.startBlockHeight = blockHeight;
+			this.startBlockHeight = currentBlockHeight;
 		}
 	}
 
